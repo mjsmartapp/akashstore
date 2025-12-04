@@ -266,25 +266,30 @@
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">Phone</label>
-                            <input type="tel" id="checkout-phone" required class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Mobile Number">
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Phone (10 Digit Only)</label>
+                            <input type="tel" id="checkout-phone" required pattern="\d{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="9876543210">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase">Email (For Order Tracking)</label>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Email</label>
                             <input type="email" id="checkout-email" required class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none bg-white" placeholder="email@example.com">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase">Address</label>
-                            <div class="flex gap-2 mb-2">
-                                <button type="button" onclick="getCheckoutLocation()" class="flex-1 bg-secondary text-primary text-[10px] font-bold py-1.5 rounded hover:bg-yellow-400 transition flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-location-crosshairs"></i> Get Current Location
-                                </button>
-                            </div>
-                            <textarea id="checkout-address" required rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary outline-none text-sm" placeholder="Delivery Address"></textarea>
+                            <textarea id="checkout-address" required rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary outline-none text-sm" placeholder="Door No, Street Name, Area..."></textarea>
                         </div>
                         
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Current Location</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="checkout-location" readonly class="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 text-xs focus:outline-none" placeholder="GPS Coordinates will appear here">
+                                <button type="button" onclick="getCheckoutLocation()" class="bg-secondary text-primary text-[10px] font-bold px-3 rounded hover:bg-yellow-400 transition whitespace-nowrap">
+                                    <i class="fa-solid fa-location-crosshairs"></i> Get Location
+                                </button>
+                            </div>
+                        </div>
+
                         <div id="order-loader" class="hidden flex justify-center py-2">
                             <div class="spinner-sm"></div>
                         </div>
@@ -301,7 +306,7 @@
     <div id="profile-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('profile-modal', false)"></div>
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
-            <div class="glass rounded-2xl shadow-2xl p-6 relative">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto hide-scrollbar">
                 <button onclick="toggleModal('profile-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
                 
                 <div class="flex flex-col items-center mb-6">
@@ -309,24 +314,62 @@
                         <img id="profile-modal-img" src="" onerror="this.style.display='none'" class="w-full h-full object-cover hidden">
                         <i id="profile-modal-icon" class="fa-solid fa-user"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-primary brand-font" id="profile-name">User Name</h2>
-                    <p class="text-gray-500 text-sm" id="profile-email">email@example.com</p>
+                    <h2 class="text-2xl font-bold text-primary brand-font" id="profile-display-name">User Name</h2>
+                    <p class="text-gray-500 text-sm" id="profile-display-email">email@example.com</p>
                 </div>
 
-                <div class="space-y-4">
+                <div id="profile-view-mode" class="space-y-4">
                     <div class="bg-gray-50 p-3 rounded-lg border">
                         <label class="block text-xs font-bold text-gray-500 uppercase">Phone</label>
-                        <p id="profile-phone" class="font-medium">Not Set</p>
+                        <p id="profile-display-phone" class="font-medium text-sm">Not Set</p>
                     </div>
                     <div class="bg-gray-50 p-3 rounded-lg border">
-                        <label class="block text-xs font-bold text-gray-500 uppercase">Saved Address</label>
-                        <p id="profile-address" class="text-sm">Not Set</p>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Address</label>
+                        <p id="profile-display-address" class="text-sm">Not Set</p>
                     </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Current Location</label>
+                        <p id="profile-display-location" class="text-xs text-gray-600 break-all">Not Set</p>
+                    </div>
+                    
+                    <button onclick="toggleProfileEdit(true)" class="w-full bg-secondary text-primary py-2 rounded-lg font-bold hover:bg-yellow-400 transition mt-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+                    </button>
+                    
+                    <button onclick="logoutUser()" class="w-full mt-2 border border-red-500 text-red-500 py-2 rounded-lg font-bold hover:bg-red-50 transition">
+                        Logout
+                    </button>
                 </div>
-                
-                <button onclick="logoutUser()" class="w-full mt-6 border border-red-500 text-red-500 py-2 rounded-lg font-bold hover:bg-red-50 transition">
-                    Logout
-                </button>
+
+                <form id="profile-edit-mode" onsubmit="saveUserProfile(event)" class="space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Name</label>
+                        <input type="text" id="edit-profile-name" required class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Phone (10 Digit)</label>
+                        <input type="tel" id="edit-profile-phone" required pattern="\d{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Address</label>
+                        <textarea id="edit-profile-address" rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary outline-none text-sm"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Current Location</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="edit-profile-location" readonly class="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 text-xs focus:outline-none" placeholder="Coordinates">
+                            <button type="button" onclick="getProfileLocation()" class="bg-secondary text-primary text-[10px] font-bold px-3 rounded hover:bg-yellow-400 transition whitespace-nowrap">
+                                Get
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-4">
+                        <button type="button" onclick="toggleProfileEdit(false)" class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-lg font-bold hover:bg-gray-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 bg-primary text-white py-2 rounded-lg font-bold hover:bg-emerald-800 transition">Save Changes</button>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
@@ -375,11 +418,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        // Import only Realtime Database functions
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getDatabase, ref, onValue, set, get, push, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyCu_WUd66NRLa_8uI06UXVTlkDh74dMBqU",
             authDomain: "vasanth-ee54c.firebaseapp.com",
@@ -395,12 +436,10 @@
         const auth = getAuth(app);
         const rtdb = getDatabase(app);
 
-        // Global State
         window.cart = {}; 
         window.productsMap = {};
-        window.currentUserData = null; // Will store basic user info from Google
+        window.currentUserData = null; 
 
-        // --- 2. UI HELPERS ---
         window.showToast = (message, type = 'success') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -441,49 +480,20 @@
             menu.classList.toggle('hidden');
         }
 
-        // --- 3. PRODUCTS & CART LOGIC (RTDB) ---
+        // --- PRODUCTS & CART ---
         
         const renderProductCard = (product) => {
             const subtitle = product.category || product.description || 'Std Pack';
             const cartItem = window.cart[product.id];
             const qty = cartItem ? cartItem.qty : 0;
-
             let buttonHtml = '';
             if (qty === 0) {
-                buttonHtml = `
-                    <button onclick="addToCart('${product.id}')" class="bg-primary text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-800 transition shadow-md w-full">
-                        Add to Cart
-                    </button>
-                `;
+                buttonHtml = `<button onclick="addToCart('${product.id}')" class="bg-primary text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-800 transition shadow-md w-full">Add to Cart</button>`;
             } else {
-                buttonHtml = `
-                    <div class="flex items-center justify-between bg-secondary rounded-full w-full px-1 py-0.5 shadow-md">
-                        <button onclick="changeQty('${product.id}', -1)" class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold hover:bg-gray-100">-</button>
-                        <span class="text-primary font-bold text-xs mx-2">${qty}</span>
-                        <button onclick="changeQty('${product.id}', 1)" class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold hover:bg-gray-100">+</button>
-                    </div>
-                `;
+                buttonHtml = `<div class="flex items-center justify-between bg-secondary rounded-full w-full px-1 py-0.5 shadow-md"><button onclick="changeQty('${product.id}', -1)" class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold hover:bg-gray-100">-</button><span class="text-primary font-bold text-xs mx-2">${qty}</span><button onclick="changeQty('${product.id}', 1)" class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold hover:bg-gray-100">+</button></div>`;
             }
-
             const imgSrc = product.image || 'https://placehold.co/400x300?text=No+Image';
-
-            return `
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition flex flex-col h-full">
-                    <div class="h-40 bg-gray-100 relative group">
-                        <img src="${imgSrc}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" class="w-full h-full object-cover transition duration-300 group-hover:scale-110">
-                    </div>
-                    <div class="p-3 flex flex-col flex-grow">
-                        <h4 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h4>
-                        <p class="text-xs text-gray-500 mb-2 truncate">${subtitle}</p>
-                        <div class="mt-auto flex justify-between items-center gap-2">
-                            <span class="text-primary font-bold text-sm">₹${product.price}</span>
-                            <div class="flex-1 max-w-[100px]">
-                                ${product.stock > 0 ? buttonHtml : '<span class="text-xs text-red-500 font-bold">Out of Stock</span>'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            return `<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition flex flex-col h-full"><div class="h-40 bg-gray-100 relative group"><img src="${imgSrc}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" class="w-full h-full object-cover transition duration-300 group-hover:scale-110"></div><div class="p-3 flex flex-col flex-grow"><h4 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h4><p class="text-xs text-gray-500 mb-2 truncate">${subtitle}</p><div class="mt-auto flex justify-between items-center gap-2"><span class="text-primary font-bold text-sm">₹${product.price}</span><div class="flex-1 max-w-[100px]">${product.stock > 0 ? buttonHtml : '<span class="text-xs text-red-500 font-bold">Out of Stock</span>'}</div></div></div></div>`;
         };
 
         const updateGrid = () => {
@@ -498,7 +508,6 @@
         const fetchProducts = () => {
             const grid = document.getElementById('products-grid');
             const productsRef = ref(rtdb, 'products');
-
             onValue(productsRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -510,227 +519,118 @@
                 } else {
                     grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No products found.</p>';
                 }
-            }, (error) => {
-                console.error("Error fetching products:", error);
-                grid.innerHTML = `<p class="col-span-full text-center text-red-500">Failed to load products.</p>`;
             });
         };
 
         window.addToCart = (id) => {
             const product = window.productsMap[id];
-            
-            if(!product || product.stock <= 0) {
-                 window.showToast("This item is currently out of stock", "error");
-                 return;
-            }
-
-            if(!window.cart[id]) {
-                window.cart[id] = { qty: 1 };
-            }
+            if(!product || product.stock <= 0) { window.showToast("This item is currently out of stock", "error"); return; }
+            if(!window.cart[id]) { window.cart[id] = { qty: 1 }; }
             updateCartUI();
         };
 
         window.changeQty = (id, change) => {
             const product = window.productsMap[id];
             if(!window.cart[id] || !product) return;
-            
             const currentQty = window.cart[id].qty;
             const newQty = currentQty + change;
-
-            if (change > 0 && newQty > product.stock) {
-                window.showToast(`Only ${product.stock} items available in stock`, "error");
-                return;
-            }
-
+            if (change > 0 && newQty > product.stock) { window.showToast(`Only ${product.stock} items available in stock`, "error"); return; }
             window.cart[id].qty = newQty;
-
-            if(window.cart[id].qty <= 0) {
-                delete window.cart[id];
-            }
+            if(window.cart[id].qty <= 0) { delete window.cart[id]; }
             updateCartUI();
         };
 
         const updateCartUI = () => {
             const totalQty = Object.values(window.cart).reduce((acc, item) => acc + item.qty, 0);
             const badge = document.getElementById('cart-badge');
-            if (badge) {
-                badge.innerText = totalQty;
-                if(totalQty > 0) badge.classList.remove('hidden');
-                else badge.classList.add('hidden');
-            }
+            if (badge) { badge.innerText = totalQty; if(totalQty > 0) badge.classList.remove('hidden'); else badge.classList.add('hidden'); }
             updateGrid();
             renderCartModalItems();
         };
 
-        // --- 4. CART POPUP & CHECKOUT ---
+        // --- CART MODAL ---
 
         window.openCartModal = () => {
             window.toggleModal('cart-modal', true);
             renderCartModalItems();
             
-            // Auto Fill logic if logged in
             const user = auth.currentUser;
             const nameInput = document.getElementById('checkout-name');
             const phoneInput = document.getElementById('checkout-phone');
             const emailInput = document.getElementById('checkout-email');
             const addrInput = document.getElementById('checkout-address');
+            const locInput = document.getElementById('checkout-location');
 
             if (user) {
                 emailInput.value = user.email || '';
                 emailInput.readOnly = false; 
                 nameInput.value = user.displayName || '';
                 
-                // Since we removed manual registration, phone/address are only available if stored in an external user record
-                // or checking previous orders. For now, we leave them blank for the user to fill.
                 if(window.currentUserData) {
                     phoneInput.value = window.currentUserData.phone || '';
                     addrInput.value = window.currentUserData.address || '';
+                    locInput.value = window.currentUserData.location || '';
                 }
             } else {
-                if(!nameInput.value) nameInput.value = '';
-                if(!phoneInput.value) phoneInput.value = '';
-                if(!emailInput.value) emailInput.value = '';
-                if(!addrInput.value) addrInput.value = '';
-                emailInput.readOnly = false;
+                nameInput.value = ''; phoneInput.value = ''; emailInput.value = ''; addrInput.value = ''; locInput.value = '';
             }
         };
 
         const renderCartModalItems = () => {
             const container = document.getElementById('cart-items-container');
             const totalDisplay = document.getElementById('cart-total-price');
-            
             if(Object.keys(window.cart).length === 0) {
                 container.innerHTML = '<div class="flex flex-col items-center justify-center py-10 opacity-50"><i class="fa-solid fa-basket-shopping text-4xl mb-2"></i><p>Your cart is empty</p></div>';
                 totalDisplay.innerText = "₹0";
                 return;
             }
-
-            let total = 0;
-            let html = '';
-
+            let total = 0; let html = '';
             Object.entries(window.cart).forEach(([id, item]) => {
                 const product = window.productsMap[id];
                 if(product) {
                     const lineTotal = product.price * item.qty;
                     total += lineTotal;
-                    html += `
-                        <div class="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
-                            <img src="${product.image || 'https://placehold.co/50'}" class="w-12 h-12 object-cover rounded bg-white">
-                            <div class="flex-1">
-                                <h5 class="font-bold text-sm text-gray-800 line-clamp-1">${product.name}</h5>
-                                <p class="text-xs text-gray-500">₹${product.price} x ${item.qty}</p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="changeQty('${id}', -1)" class="w-6 h-6 rounded bg-white border text-primary font-bold shadow hover:bg-gray-100">-</button>
-                                <span class="text-sm font-bold w-4 text-center">${item.qty}</span>
-                                <button onclick="changeQty('${id}', 1)" class="w-6 h-6 rounded bg-white border text-primary font-bold shadow hover:bg-gray-100">+</button>
-                            </div>
-                        </div>
-                    `;
+                    html += `<div class="flex items-center gap-3 bg-gray-50 p-2 rounded-lg"><img src="${product.image || 'https://placehold.co/50'}" class="w-12 h-12 object-cover rounded bg-white"><div class="flex-1"><h5 class="font-bold text-sm text-gray-800 line-clamp-1">${product.name}</h5><p class="text-xs text-gray-500">₹${product.price} x ${item.qty}</p></div><div class="flex items-center gap-2"><button onclick="changeQty('${id}', -1)" class="w-6 h-6 rounded bg-white border text-primary font-bold shadow hover:bg-gray-100">-</button><span class="text-sm font-bold w-4 text-center">${item.qty}</span><button onclick="changeQty('${id}', 1)" class="w-6 h-6 rounded bg-white border text-primary font-bold shadow hover:bg-gray-100">+</button></div></div>`;
                 }
             });
-
             container.innerHTML = html;
             totalDisplay.innerText = "₹" + total;
         };
 
-        // NEW: Check order history to toggle menu visibility
-        window.checkOrderHistory = async (email) => {
-            if(!email) return;
-
-            const navProfile = document.getElementById('nav-profile-link');
-            const navOrders = document.getElementById('nav-orders-link');
-            const navDivider = document.getElementById('nav-divider');
-            const drawerProfile = document.getElementById('drawer-profile-link');
-            const drawerOrders = document.getElementById('drawer-orders-link');
-            const drawerContainer = document.getElementById('drawer-user-links');
-
-            try {
-                const ordersRef = ref(rtdb, 'orders');
-                const snapshot = await get(ordersRef);
-                
-                let hasOrders = false;
-                if(snapshot.exists()) {
-                    const allOrders = snapshot.val();
-                    const myOrders = Object.values(allOrders).filter(order => order.email === email);
-                    if(myOrders.length > 0) {
-                        hasOrders = true;
-                        // Use latest order to populate profile if available
-                        const latest = myOrders.sort((a,b) => b.orderDate - a.orderDate)[0];
-                        window.currentUserData = {
-                            name: latest.customerName,
-                            phone: latest.customerPhone,
-                            address: latest.address,
-                            email: latest.email
-                        };
-                    }
-                }
-
-                if(hasOrders) {
-                    // UNHIDE ELEMENTS
-                    navProfile.classList.remove('hidden');
-                    navOrders.classList.remove('hidden');
-                    navProfile.classList.add('block');
-                    navOrders.classList.add('block');
-                    navDivider.classList.remove('hidden');
-
-                    drawerContainer.classList.remove('hidden');
-                    drawerProfile.classList.remove('hidden');
-                    drawerOrders.classList.remove('hidden');
-                    drawerProfile.classList.add('flex');
-                    drawerOrders.classList.add('flex');
-                } else {
-                    // HIDE ELEMENTS (Ensure they remain hidden if 0 orders)
-                    navProfile.classList.add('hidden');
-                    navOrders.classList.add('hidden');
-                    navProfile.classList.remove('block');
-                    navOrders.classList.remove('block');
-                    navDivider.classList.add('hidden');
-
-                    drawerContainer.classList.add('hidden');
-                }
-
-            } catch (e) {
-                console.error("Error checking order history:", e);
-            }
-        };
-
         window.handlePlaceOrder = async (e) => {
             e.preventDefault();
-            
-            if(Object.keys(window.cart).length === 0) {
-                window.showToast("Cart is empty", "error");
-                return;
+            if(Object.keys(window.cart).length === 0) { window.showToast("Cart is empty", "error"); return; }
+
+            const phone = document.getElementById('checkout-phone').value;
+            if(!/^\d{10}$/.test(phone)) {
+                 window.showToast("Phone number must be exactly 10 digits", "error");
+                 return;
             }
 
             const loader = document.getElementById('order-loader');
             const btn = document.getElementById('place-order-btn');
-            loader.classList.remove('hidden');
-            btn.classList.add('hidden');
+            loader.classList.remove('hidden'); btn.classList.add('hidden');
 
             const name = document.getElementById('checkout-name').value;
-            const phone = document.getElementById('checkout-phone').value;
             const email = document.getElementById('checkout-email').value;
-            const address = document.getElementById('checkout-address').value;
+            const manualAddr = document.getElementById('checkout-address').value;
+            const gpsLoc = document.getElementById('checkout-location').value;
             const total = document.getElementById('cart-total-price').innerText;
+
+            // Combine manual address and GPS location
+            let fullAddress = manualAddr;
+            if(gpsLoc) fullAddress += `\n[GPS: ${gpsLoc}]`;
 
             const items = Object.entries(window.cart).map(([id, item]) => {
                 const prod = window.productsMap[id];
-                return {
-                    id: id,
-                    name: prod.name,
-                    price: prod.price,
-                    qty: item.qty,
-                    subtotal: prod.price * item.qty
-                };
+                return { id: id, name: prod.name, price: prod.price, qty: item.qty, subtotal: prod.price * item.qty };
             });
 
-            // Store in RTDB under 'orders'
             const orderData = {
                 customerName: name,
                 customerPhone: phone,
                 email: email, 
-                address: address,
+                address: fullAddress,
                 items: items,
                 totalAmount: total,
                 orderDate: Date.now(),
@@ -738,206 +638,204 @@
             };
 
             try {
-                // 1. Save Order to RTDB
                 const newOrderRef = push(ref(rtdb, 'orders'));
                 await set(newOrderRef, orderData);
                 
-                // 2. Update Stock in RTDB (Decrement stock)
+                // Update Stock
                 for (const item of items) {
                      const currentProd = window.productsMap[item.id];
                      if(currentProd) {
                          const newStock = Math.max(0, currentProd.stock - item.qty);
-                         await update(ref(rtdb, `products/${item.id}`), {
-                             stock: newStock
-                         });
+                         await update(ref(rtdb, `products/${item.id}`), { stock: newStock });
                      }
                 }
-
                 window.showToast(`Order Placed Successfully! Total: ${total}`);
-                
-                // 3. IMPORTANT: Update UI to show Profile/Orders immediately
                 await checkOrderHistory(email);
-
-                // Clear Cart
-                window.cart = {};
-                updateCartUI();
-                window.toggleModal('cart-modal', false);
-
+                window.cart = {}; updateCartUI(); window.toggleModal('cart-modal', false);
             } catch (error) {
-                console.error("Order Error: ", error);
-                window.showToast("Failed to place order. Try again.", "error");
+                console.error("Order Error: ", error); window.showToast("Failed to place order.", "error");
             } finally {
-                loader.classList.add('hidden');
-                btn.classList.remove('hidden');
+                loader.classList.add('hidden'); btn.classList.remove('hidden');
             }
         };
 
-        // --- 5. LOCATION (Checkout) ---
+        // --- LOCATION HANDLERS ---
+        
         window.getCheckoutLocation = () => {
-             if (!navigator.geolocation) {
-                window.showToast("Geolocation is not supported.", "error");
-                return;
-            }
-            const btn = document.querySelector('button[onclick="getCheckoutLocation()"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const addressField = document.getElementById('checkout-address');
-                    const currentVal = addressField.value ? addressField.value + "\n" : "";
-                    addressField.value = `${currentVal}Location: ${lat}, ${lng}`;
-                    window.showToast("Location added to address!");
-                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Done';
-                    setTimeout(() => btn.innerHTML = originalText, 2000);
-                },
-                (error) => {
-                    window.showToast("Please turn on your location", "error");
-                    btn.innerHTML = originalText;
-                }
-            );
+             if (!navigator.geolocation) { window.showToast("Geolocation not supported.", "error"); return; }
+             const btn = document.querySelector('button[onclick="getCheckoutLocation()"]');
+             const originalText = btn.innerHTML;
+             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+             navigator.geolocation.getCurrentPosition((pos) => {
+                 document.getElementById('checkout-location').value = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                 window.showToast("Location fetched!");
+                 btn.innerHTML = originalText;
+             }, () => { window.showToast("Location access denied", "error"); btn.innerHTML = originalText; });
         };
 
-        // --- 6. PROFILE & ORDERS VIEWS (RTDB) ---
+        window.getProfileLocation = () => {
+             if (!navigator.geolocation) { window.showToast("Geolocation not supported.", "error"); return; }
+             const btn = document.querySelector('button[onclick="getProfileLocation()"]');
+             const originalText = btn.innerHTML;
+             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+             navigator.geolocation.getCurrentPosition((pos) => {
+                 document.getElementById('edit-profile-location').value = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                 window.showToast("Location fetched!");
+                 btn.innerHTML = originalText;
+             }, () => { window.showToast("Location access denied", "error"); btn.innerHTML = originalText; });
+        };
+
+        // --- PROFILE LOGIC ---
 
         window.openProfileModal = () => {
-            if(!auth.currentUser) {
-                window.showToast("Please login to view profile", "error");
-                window.toggleModal('login-modal', true);
-                return;
-            }
+            if(!auth.currentUser) { window.showToast("Please login", "error"); return; }
             
-            document.getElementById('profile-name').innerText = auth.currentUser.displayName || 'User';
-            document.getElementById('profile-email').innerText = auth.currentUser.email;
-            
-            // Photo
+            // Populate View Mode
+            document.getElementById('profile-display-name').innerText = window.currentUserData?.name || auth.currentUser.displayName || 'User';
+            document.getElementById('profile-display-email').innerText = auth.currentUser.email;
+            document.getElementById('profile-display-phone').innerText = window.currentUserData?.phone || 'Not Set';
+            document.getElementById('profile-display-address').innerText = window.currentUserData?.address || 'Not Set';
+            document.getElementById('profile-display-location').innerText = window.currentUserData?.location || 'Not Set';
+
+            // Populate Edit Mode Inputs
+            document.getElementById('edit-profile-name').value = window.currentUserData?.name || auth.currentUser.displayName || '';
+            document.getElementById('edit-profile-phone').value = window.currentUserData?.phone || '';
+            document.getElementById('edit-profile-address').value = window.currentUserData?.address || '';
+            document.getElementById('edit-profile-location').value = window.currentUserData?.location || '';
+
+            // Handle Avatar
             const imgEl = document.getElementById('profile-modal-img');
             const iconEl = document.getElementById('profile-modal-icon');
-            if(auth.currentUser.photoURL) {
-                imgEl.src = auth.currentUser.photoURL;
-                imgEl.style.display = 'block';
-                imgEl.classList.remove('hidden');
-                iconEl.style.display = 'none';
-            } else {
-                 imgEl.style.display = 'none';
-                 iconEl.style.display = 'block';
-            }
+            if(auth.currentUser.photoURL) { imgEl.src = auth.currentUser.photoURL; imgEl.classList.remove('hidden'); iconEl.style.display = 'none'; } 
+            else { imgEl.style.display = 'none'; iconEl.style.display = 'block'; }
 
-            // Data from last order (if any)
-            if(window.currentUserData) {
-                document.getElementById('profile-phone').innerText = window.currentUserData.phone || 'Not Set';
-                document.getElementById('profile-address').innerText = window.currentUserData.address || 'Not Set';
-            }
-
+            // Ensure View Mode is active initially
+            window.toggleProfileEdit(false);
             window.toggleModal('profile-modal', true);
         }
 
-        window.openOrdersModal = async () => {
-            if(!auth.currentUser) {
-                window.showToast("Please login to view orders", "error");
-                window.toggleModal('login-modal', true);
-                return;
-            }
-            
-            window.toggleModal('orders-modal', true);
-            const container = document.getElementById('orders-list-container');
-            container.innerHTML = '<div class="flex justify-center py-8"><div class="spinner border-primary"></div></div>';
-
-            try {
-                // Fetch orders from RTDB
-                const ordersRef = ref(rtdb, 'orders');
-                const snapshot = await get(ordersRef);
-                
-                if(!snapshot.exists()) {
-                    container.innerHTML = '<p class="text-center text-gray-500 py-4">No orders found.</p>';
-                    return;
-                }
-
-                const allOrders = snapshot.val();
-                const myOrders = Object.values(allOrders)
-                    .filter(order => order.email === auth.currentUser.email)
-                    .sort((a, b) => b.orderDate - a.orderDate); 
-
-                if(myOrders.length === 0) {
-                     container.innerHTML = '<p class="text-center text-gray-500 py-4">No orders found for this account.</p>';
-                     return;
-                }
-
-                let html = '';
-                myOrders.forEach((data) => {
-                    const date = data.orderDate ? new Date(data.orderDate).toLocaleDateString() + ' ' + new Date(data.orderDate).toLocaleTimeString() : 'Recent';
-                    
-                    let itemsHtml = data.items.map(i => `
-                        <div class="flex justify-between text-xs text-gray-600">
-                            <span>${i.name} x ${i.qty}</span>
-                            <span>₹${i.subtotal}</span>
-                        </div>
-                    `).join('');
-
-                    html += `
-                        <div class="bg-gray-50 rounded-lg p-4 border hover:shadow-md transition">
-                            <div class="flex justify-between items-center mb-2 border-b pb-2">
-                                <span class="text-xs font-bold text-gray-500">${date}</span>
-                                <span class="text-sm font-bold text-primary">${data.totalAmount}</span>
-                            </div>
-                            <div class="space-y-1 mb-2">
-                                ${itemsHtml}
-                            </div>
-                            <div class="text-xs text-right">
-                                <span class="px-2 py-1 rounded bg-secondary text-primary font-bold text-[10px]">${data.status || 'Received'}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-
-            } catch (error) {
-                console.error("Error fetching orders:", error);
-                container.innerHTML = '<p class="text-center text-red-500 py-4">Failed to load history.</p>';
+        window.toggleProfileEdit = (isEdit) => {
+            const viewMode = document.getElementById('profile-view-mode');
+            const editMode = document.getElementById('profile-edit-mode');
+            if(isEdit) {
+                viewMode.classList.add('hidden');
+                editMode.classList.remove('hidden');
+            } else {
+                viewMode.classList.remove('hidden');
+                editMode.classList.add('hidden');
             }
         }
 
-        // --- 7. AUTH HANDLERS ---
+        window.saveUserProfile = async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if(!user) return;
+
+            const name = document.getElementById('edit-profile-name').value;
+            const phone = document.getElementById('edit-profile-phone').value;
+            const address = document.getElementById('edit-profile-address').value;
+            const location = document.getElementById('edit-profile-location').value;
+
+             if(!/^\d{10}$/.test(phone)) {
+                 window.showToast("Phone number must be exactly 10 digits", "error");
+                 return;
+            }
+
+            try {
+                // Update Display Name in Auth
+                await updateProfile(user, { displayName: name });
+                
+                // Update Database
+                const userData = {
+                    name, phone, address, location, email: user.email
+                };
+                
+                await update(ref(rtdb, 'users/' + user.uid), userData);
+                
+                // Update Local Data
+                window.currentUserData = userData;
+                
+                window.showToast("Profile Updated Successfully!");
+                window.openProfileModal(); // Refresh view
+            } catch (error) {
+                console.error(error);
+                window.showToast("Failed to update profile", "error");
+            }
+        };
+
+        window.checkOrderHistory = async (email) => {
+            if(!email) return;
+            const navEls = [document.getElementById('nav-profile-link'), document.getElementById('nav-orders-link'), document.getElementById('drawer-profile-link'), document.getElementById('drawer-orders-link')];
+            const containers = [document.getElementById('drawer-user-links')];
+            
+            try {
+                // Check User Profile First
+                const userSnapshot = await get(ref(rtdb, 'users/' + auth.currentUser.uid));
+                if(userSnapshot.exists()) {
+                    window.currentUserData = userSnapshot.val();
+                    navEls.forEach(el => { el.classList.remove('hidden'); el.classList.add(el.id.includes('drawer') ? 'flex' : 'block'); });
+                    containers.forEach(el => el.classList.remove('hidden'));
+                    document.getElementById('nav-divider').classList.remove('hidden');
+                    return;
+                }
+
+                // Fallback to Orders if no profile exists
+                const ordersRef = ref(rtdb, 'orders');
+                const snapshot = await get(ordersRef);
+                let hasOrders = false;
+                if(snapshot.exists()) {
+                    const myOrders = Object.values(snapshot.val()).filter(order => order.email === email);
+                    if(myOrders.length > 0) {
+                        hasOrders = true;
+                        const latest = myOrders.sort((a,b) => b.orderDate - a.orderDate)[0];
+                        // Extract GPS if exists in address string
+                        let addr = latest.address;
+                        let loc = "";
+                        if(addr.includes('[GPS:')) {
+                            const parts = addr.split('[GPS:');
+                            addr = parts[0].trim();
+                            loc = parts[1].replace(']', '').trim();
+                        }
+                        
+                        window.currentUserData = { name: latest.customerName, phone: latest.customerPhone, address: addr, location: loc, email: latest.email };
+                        
+                        // Save this inferred data to users node so edit works later
+                        await update(ref(rtdb, 'users/' + auth.currentUser.uid), window.currentUserData);
+                    }
+                }
+
+                if(hasOrders) {
+                    navEls.forEach(el => { el.classList.remove('hidden'); el.classList.add(el.id.includes('drawer') ? 'flex' : 'block'); });
+                    containers.forEach(el => el.classList.remove('hidden'));
+                    document.getElementById('nav-divider').classList.remove('hidden');
+                } else {
+                    navEls.forEach(el => el.classList.add('hidden'));
+                    containers.forEach(el => el.classList.add('hidden'));
+                    document.getElementById('nav-divider').classList.add('hidden');
+                }
+            } catch (e) { console.error(e); }
+        };
+
+        // --- AUTH & INIT ---
+
         onAuthStateChanged(auth, async (user) => {
             const loginBtn = document.getElementById('login-btn-header');
             const profileArea = document.getElementById('user-profile-header');
-            
-            // Header Elements
             const avatarImg = document.getElementById('user-avatar');
             const defaultIcon = document.getElementById('user-icon-default');
 
             if (user) {
-                loginBtn.classList.add('hidden');
-                profileArea.classList.remove('hidden');
-                profileArea.classList.add('flex');
+                loginBtn.classList.add('hidden'); profileArea.classList.remove('hidden'); profileArea.classList.add('flex');
                 document.getElementById('user-name-display').innerText = user.displayName || 'User';
-                
-                if(user.photoURL) {
-                    avatarImg.src = user.photoURL;
-                    avatarImg.classList.remove('hidden');
-                    avatarImg.style.display = 'block';
-                    defaultIcon.classList.add('hidden');
-                } else {
-                     avatarImg.classList.add('hidden');
-                     defaultIcon.classList.remove('hidden');
-                }
-
-                // Check for existing orders to determine visibility of "Profile" & "My Orders"
+                if(user.photoURL) { avatarImg.src = user.photoURL; avatarImg.classList.remove('hidden'); avatarImg.style.display = 'block'; defaultIcon.classList.add('hidden'); } 
+                else { avatarImg.classList.add('hidden'); defaultIcon.classList.remove('hidden'); }
                 await checkOrderHistory(user.email);
-
                 window.toggleModal('login-modal', false);
             } else {
-                loginBtn.classList.remove('hidden');
-                profileArea.classList.add('hidden');
-                profileArea.classList.remove('flex');
-                
-                // Hide user-specific links
+                loginBtn.classList.remove('hidden'); profileArea.classList.add('hidden'); profileArea.classList.remove('flex');
                 document.getElementById('nav-profile-link').classList.add('hidden');
                 document.getElementById('nav-orders-link').classList.add('hidden');
                 document.getElementById('drawer-user-links').classList.add('hidden');
-                
                 window.currentUserData = null;
             }
         });
@@ -945,39 +843,39 @@
         window.handleGoogleSignIn = async () => {
             const loader = document.getElementById('login-process-loader');
             loader.classList.remove('hidden'); 
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-                window.showToast("Google Sign-In Successful!");
-            } catch (error) {
-                window.showToast("Google Sign-In failed: " + error.message, "error");
-            } finally {
-                loader.classList.add('hidden');
-            }
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); window.showToast("Signed In!"); } 
+            catch (error) { window.showToast("Sign In Failed", "error"); } 
+            finally { loader.classList.add('hidden'); }
         };
 
         window.logoutUser = async () => {
-            try {
-                await signOut(auth);
-                window.cart = {}; 
-                updateCartUI();
-                window.showToast("Logged out successfully");
-                window.toggleModal('profile-modal', false);
-            } catch (error) {
-                console.error(error);
-            }
+            try { await signOut(auth); window.cart = {}; updateCartUI(); window.showToast("Logged Out"); window.toggleModal('profile-modal', false); } catch (e) { console.error(e); }
         };
+        
+        window.openOrdersModal = async () => {
+            if(!auth.currentUser) return;
+            window.toggleModal('orders-modal', true);
+            const container = document.getElementById('orders-list-container');
+            container.innerHTML = '<div class="flex justify-center py-8"><div class="spinner border-primary"></div></div>';
+            try {
+                const snapshot = await get(ref(rtdb, 'orders'));
+                if(!snapshot.exists()) { container.innerHTML = '<p class="text-center text-gray-500">No orders found.</p>'; return; }
+                const myOrders = Object.values(snapshot.val()).filter(order => order.email === auth.currentUser.email).sort((a, b) => b.orderDate - a.orderDate); 
+                if(myOrders.length === 0) { container.innerHTML = '<p class="text-center text-gray-500">No orders found.</p>'; return; }
+                let html = '';
+                myOrders.forEach((data) => {
+                    const date = new Date(data.orderDate).toLocaleDateString();
+                    let itemsHtml = data.items.map(i => `<div class="flex justify-between text-xs text-gray-600"><span>${i.name} x ${i.qty}</span><span>₹${i.subtotal}</span></div>`).join('');
+                    html += `<div class="bg-gray-50 rounded-lg p-4 border hover:shadow-md transition"><div class="flex justify-between items-center mb-2 border-b pb-2"><span class="text-xs font-bold text-gray-500">${date}</span><span class="text-sm font-bold text-primary">${data.totalAmount}</span></div><div class="space-y-1 mb-2">${itemsHtml}</div><div class="text-xs text-right"><span class="px-2 py-1 rounded bg-secondary text-primary font-bold text-[10px]">${data.status || 'Received'}</span></div></div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) { container.innerHTML = '<p class="text-center text-red-500">Failed to load.</p>'; }
+        }
 
-        // --- 8. INITIALIZATION ---
         window.addEventListener('load', () => {
             fetchProducts();
-            setTimeout(() => {
-                const loader = document.getElementById('loader-overlay');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
-            }, 1000);
+            setTimeout(() => { document.getElementById('loader-overlay').style.display = 'none'; }, 1000);
         });
-
     </script>
 </body>
 </html>
