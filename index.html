@@ -1,518 +1,983 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Royal Dry Fruits | Premium & Healthy</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="index.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="page-gradient"></div>
-    <div class="grain-overlay"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RS Dry Fruits & Millets</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- NAVBAR -->
-    <header class="navbar">
-      <div class="nav-left">
-        <div class="logo-mark">
-          <span class="logo-icon">🌰</span>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#064e3b', // Emerald 900
+                        secondary: '#fbbf24', // Amber 400
+                        accent: '#ecfdf5', // Emerald 50
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Animations */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, .brand-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Global Loader */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #064e3b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Drawer Transition */
+        #drawer {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: white;
+            border-left: 4px solid #064e3b;
+            padding: 16px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 250px;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Glassmorphism for Modal */
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Modal Overlay Loader */
+        .modal-loader {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="loader-overlay">
+        <div class="flex flex-col items-center">
+            <div class="spinner mb-4"></div>
+            <p class="text-primary font-serif tracking-widest text-sm">LOADING RS DRY FRUITS</p>
         </div>
-        <div class="logo-text">
-          <span class="brand-name">Royal Dry Fruits</span>
-          <span class="brand-tagline">Curated, premium & fresh</span>
-        </div>
-      </div>
-
-      <nav class="nav-links">
-        <a href="#hero" class="nav-link">Home</a>
-        <a href="#collections" class="nav-link">Product</a>
-        <a href="#benefits" class="nav-link">Orders</a>
-        <a href="#stories" class="nav-link">Profile</a>
-      </nav>
-
-      <div class="nav-right">
-        <button class="cart-chip" type="button">
-          <span class="cart-icon">🛒</span>
-          <span class="cart-label">Cart</span>
-          <span class="cart-count">3</span>
-        </button>
-
-        <!-- this text changes Sign in <-> Logout via JS -->
-        <button class="nav-auth-btn" data-login-btn type="button">
-          <span class="btn-glow"></span>
-          <span class="btn-label">Sign in</span>
-        </button>
-
-        <div class="user-pill hidden" data-user-pill>
-          <img
-            src=""
-            alt="User avatar"
-            class="user-avatar"
-            data-user-avatar
-          />
-          <span class="user-name" data-user-name></span>
-        </div>
-      </div>
-    </header>
-
-    <!-- HERO -->
-    <main>
-      <section id="hero" class="hero">
-        <div class="hero-content">
-          <div class="hero-eyebrow">
-            <span class="pill pill-soft">New Season • 2025 Harvest</span>
-            <span class="pill pill-contrast">100% Handpicked</span>
-          </div>
-
-          <h1 class="hero-title">
-            Elevate your day with
-            <span class="hero-highlight">luxury dry fruits</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            Curated nuts, berries & seeds from trusted farms – air-sealed to lock
-            in <strong>freshness, crunch & nutrients</strong>. Perfect for
-            snacking, gifting and mindful living.
-          </p>
-
-          <div class="hero-actions">
-            <button class="primary-btn" type="button">
-              <span>Shop Signature Boxes</span>
-              <span class="primary-btn-icon">→</span>
-            </button>
-
-            <button class="ghost-btn" data-login-btn type="button">
-              <span class="ghost-btn-icon">⚡</span>
-              <span>Sign in to unlock rewards</span>
-            </button>
-          </div>
-
-          <div class="hero-metrics">
-            <div class="metric-card">
-              <span class="metric-value">25K+</span>
-              <span class="metric-label">Happy customers</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-value">4.9★</span>
-              <span class="metric-label">Average rating</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-value">48h</span>
-              <span class="metric-label">Fresh delivery</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-visual">
-          <div class="hero-orbit orbit-lg"></div>
-          <div class="hero-orbit orbit-md"></div>
-          <div class="hero-orbit orbit-sm"></div>
-
-          <div class="hero-main-card">
-            <div class="hero-badge">Bestseller Trio</div>
-            <div class="hero-main-image">
-              <div class="nut nut-1">🥜</div>
-              <div class="nut nut-2">🥜</div>
-              <div class="nut nut-3">🥜</div>
-              <div class="nut nut-4">🥜</div>
-            </div>
-            <div class="hero-main-info">
-              <span class="hero-main-title">Royal Energy Mix</span>
-              <span class="hero-main-meta"
-                >Almonds • Pistachios • Cashews • Berries</span
-              >
-              <div class="hero-main-footer">
-                <span class="hero-main-price">₹799</span>
-                <span class="hero-main-tag">Free gift wrap ✨</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="floating-card card-left">
-            <span class="floating-label">Premium Kashmiri Almonds</span>
-            <span class="floating-meta">Soaked in sunrise, packed in sunset.</span>
-          </div>
-
-          <div class="floating-card card-right">
-            <span class="floating-label">Zero Added Sugar</span>
-            <span class="floating-meta">Pure, natural sweetness only.</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- PRODUCT -->
-      <section id="collections" class="section">
-        <div class="section-header">
-          <h2>Curated Collections</h2>
-          <p>Thoughtfully designed assortments for every mood, moment & occasion.</p>
-        </div>
-
-        <div class="card-grid">
-          <article class="product-card">
-            <div class="product-tag product-tag-new">Fresh Batch</div>
-            <div class="product-img-layer">
-              <div class="product-img product-img-1"></div>
-            </div>
-            <div class="product-body">
-              <h3>Morning Ritual Box</h3>
-              <p>
-                Light, crunchy and clean – crafted to start your day on a slow,
-                mindful note.
-              </p>
-              <div class="product-meta-row">
-                <span class="chip">Almonds</span>
-                <span class="chip">Dried figs</span>
-                <span class="chip">Golden raisins</span>
-              </div>
-            </div>
-            <div class="product-footer">
-              <span class="product-price">₹599</span>
-              <button class="soft-btn" type="button">Quick view</button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-tag product-tag-hot">Most Loved</div>
-            <div class="product-img-layer">
-              <div class="product-img product-img-2"></div>
-            </div>
-            <div class="product-body">
-              <h3>Gourmet Gift Hamper</h3>
-              <p>
-                When you want your gifts to feel as luxurious as they look – this
-                is it.
-              </p>
-              <div class="product-meta-row">
-                <span class="chip">Pistachios</span>
-                <span class="chip">Cashews</span>
-                <span class="chip">Berry medley</span>
-              </div>
-            </div>
-            <div class="product-footer">
-              <span class="product-price">₹1,499</span>
-              <button class="soft-btn" type="button">Add to cart</button>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-tag product-tag-limited">Limited</div>
-            <div class="product-img-layer">
-              <div class="product-img product-img-3"></div>
-            </div>
-            <div class="product-body">
-              <h3>Midnight Snack Mix</h3>
-              <p>
-                A slow-roasted medley for movie nights and late-work marathons.
-              </p>
-              <div class="product-meta-row">
-                <span class="chip">Roasted nuts</span>
-                <span class="chip">Seeds</span>
-                <span class="chip">Dark chocolate</span>
-              </div>
-            </div>
-            <div class="product-footer">
-              <span class="product-price">₹899</span>
-              <button class="soft-btn" type="button">Notify me</button>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- ORDERS / BENEFITS SECTION -->
-      <section id="benefits" class="section section-split">
-        <div class="section-header">
-          <h2>Orders & everyday benefits</h2>
-          <p>Snack smart daily while your orders stay organised and easy to repeat.</p>
-        </div>
-
-        <div class="benefits-layout">
-          <div class="benefit-list">
-            <div class="benefit-row">
-              <div class="benefit-icon-wrap">
-                <span class="benefit-icon">📦</span>
-              </div>
-              <div>
-                <h3>One-tap reorders</h3>
-                <p>
-                  Save your favourite mixes and repeat the same box whenever you
-                  like.
-                </p>
-              </div>
-            </div>
-
-            <div class="benefit-row">
-              <div class="benefit-icon-wrap">
-                <span class="benefit-icon">🧾</span>
-              </div>
-              <div>
-                <h3>Order history</h3>
-                <p>
-                  Keep track of your snack journey and explore past orders in one
-                  view.
-                </p>
-              </div>
-            </div>
-
-            <div class="benefit-row">
-              <div class="benefit-icon-wrap">
-                <span class="benefit-icon">⚡</span>
-              </div>
-              <div>
-                <h3>Real-time updates</h3>
-                <p>Stay in the loop with smooth tracking from roast to doorstep.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="benefit-highlight">
-            <div class="benefit-badge">Members-only perk</div>
-            <h3>Earn rewards every time you snack.</h3>
-            <p>
-              Sign in with Google or email to unlock loyalty points, early access
-              drops and birthday specials crafted exclusively for our community.
-            </p>
-            <button class="primary-btn alt" data-login-btn type="button">
-              <span>Sign in or create account</span>
-              <span class="primary-btn-icon">✨</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- PROFILE / STORIES SECTION -->
-      <section id="stories" class="section">
-        <div class="section-header">
-          <h2>Your snack profile in real stories</h2>
-          <p>People who track what they eat, and love every bite while doing it.</p>
-        </div>
-
-        <div class="stories-row">
-          <article class="story-card">
-            <p class="story-text">
-              “I used to skip breakfast. Now I keep a Royal Energy Mix jar on my
-              desk and I’m sorted.”
-            </p>
-            <div class="story-meta">
-              <div class="story-avatar">VK</div>
-              <div>
-                <div class="story-name">Vasanth Kumar</div>
-                <div class="story-role">Product Designer, Bangalore</div>
-              </div>
-            </div>
-          </article>
-
-          <article class="story-card">
-            <p class="story-text">
-              “Their gift hampers have become my go-to. Elegant, thoughtful and
-              actually gets finished.”
-            </p>
-            <div class="story-meta">
-              <div class="story-avatar">AR</div>
-              <div>
-                <div class="story-name">Ananya Rao</div>
-                <div class="story-role">Entrepreneur, Hyderabad</div>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="footer-left">
-        <div class="footer-logo">Royal Dry Fruits</div>
-        <p>Small-batch, slow-roasted & carefully packed from our kitchen to yours.</p>
-      </div>
-      <div class="footer-right">
-        <span>Made for mindful snacking · 2025</span>
-      </div>
-    </footer>
-
-    <!-- AUTH MODAL -->
-    <div class="auth-backdrop hidden" data-auth-backdrop>
-      <div class="auth-modal" data-auth-modal>
-        <button class="auth-close" type="button" data-auth-close>✕</button>
-
-        <div class="auth-header">
-          <span class="auth-pill" data-auth-pill>Welcome back</span>
-          <h2 data-auth-title>Sign in to your dry-fruit haven</h2>
-          <p data-auth-subtitle>
-            Track orders, earn points and unlock members-only drops.
-          </p>
-        </div>
-
-        <!-- TABS -->
-        <div class="auth-tabs">
-          <button
-            type="button"
-            class="auth-tab auth-tab-active"
-            data-auth-tab="login"
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            class="auth-tab"
-            data-auth-tab="register"
-          >
-            Register
-          </button>
-        </div>
-
-        <div class="auth-body">
-          <!-- LOGIN PANEL -->
-          <div class="auth-panel" data-auth-panel="login">
-            <button class="google-btn" type="button" data-google-btn>
-              <span class="google-icon">
-                <span class="google-g">G</span>
-              </span>
-              <span class="google-label">Continue with Google</span>
-            </button>
-
-            <div class="auth-divider">
-              <span></span>
-              <span class="auth-divider-label">or login with email</span>
-              <span></span>
-            </div>
-
-            <form class="auth-form" data-login-form>
-              <div class="field">
-                <label class="field-label" for="login-email">Email</label>
-                <input
-                  id="login-email"
-                  type="email"
-                  required
-                  autocomplete="email"
-                  data-login-email
-                />
-              </div>
-
-              <div class="field">
-                <label class="field-label" for="login-password">Password</label>
-                <input
-                  id="login-password"
-                  type="password"
-                  minlength="6"
-                  required
-                  autocomplete="current-password"
-                  data-login-password
-                />
-              </div>
-
-              <button
-                class="primary-btn field-submit"
-                type="submit"
-                data-login-submit
-              >
-                <span>Login</span>
-                <span class="primary-btn-icon">→</span>
-              </button>
-            </form>
-          </div>
-
-          <!-- REGISTER PANEL -->
-          <div class="auth-panel hidden" data-auth-panel="register">
-            <button
-              class="google-btn google-btn-secondary"
-              type="button"
-              data-google-btn
-            >
-              <span class="google-icon">
-                <span class="google-g">G</span>
-              </span>
-              <span class="google-label">Sign up with Google</span>
-            </button>
-
-            <div class="auth-divider">
-              <span></span>
-              <span class="auth-divider-label">or create with email</span>
-              <span></span>
-            </div>
-
-            <form class="auth-form" data-register-form>
-              <div class="field">
-                <label class="field-label" for="reg-name">Full name</label>
-                <input
-                  id="reg-name"
-                  type="text"
-                  required
-                  autocomplete="name"
-                  data-register-name
-                />
-              </div>
-
-              <div class="field">
-                <label class="field-label" for="reg-phone">Phone (10 digits)</label>
-                <input
-                  id="reg-phone"
-                  type="tel"
-                  inputmode="numeric"
-                  pattern="[0-9]{10}"
-                  maxlength="10"
-                  required
-                  data-register-phone
-                />
-              </div>
-
-              <div class="field">
-                <label class="field-label" for="reg-address">Address</label>
-                <textarea
-                  id="reg-address"
-                  rows="2"
-                  required
-                  data-register-address
-                ></textarea>
-              </div>
-
-              <div class="field">
-                <label class="field-label" for="reg-email">Email</label>
-                <input
-                  id="reg-email"
-                  type="email"
-                  required
-                  autocomplete="email"
-                  data-register-email
-                />
-              </div>
-
-              <div class="field">
-                <label class="field-label" for="reg-password">Password</label>
-                <input
-                  id="reg-password"
-                  type="password"
-                  minlength="6"
-                  required
-                  autocomplete="new-password"
-                  data-register-password
-                />
-              </div>
-
-              <button
-                class="primary-btn field-submit"
-                type="submit"
-                data-register-submit
-              >
-                <span>Create account</span>
-                <span class="primary-btn-icon">✨</span>
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div class="auth-status" data-auth-status></div>
-
-        <div class="auth-footer">
-          <span>By continuing you agree to our terms & privacy policy.</span>
-        </div>
-      </div>
     </div>
 
-    <script type="module" src="index.js"></script>
-  </body>
+    <div id="toast-container"></div>
+
+    <header class="fixed top-0 left-0 right-0 bg-primary text-white shadow-lg z-40 h-16">
+        <div class="container mx-auto px-4 h-full flex items-center justify-between">
+            
+            <div class="flex items-center gap-4 w-1/4">
+                <button onclick="toggleDrawer(true)" class="text-xl hover:text-secondary transition p-2">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="relative cursor-pointer hover:text-secondary transition" onclick="openCartModal()">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-secondary text-primary text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                </div>
+            </div>
+
+            <div class="w-2/4 text-center">
+                <h1 class="text-sm md:text-lg font-bold tracking-wider truncate text-secondary">RS DRY FRUITS & MILLETS</h1>
+            </div>
+
+            <div class="w-1/4 flex justify-end relative">
+                <button id="login-btn-header" onclick="toggleModal('login-modal', true)" class="bg-secondary text-primary px-4 py-1.5 rounded-full text-sm font-bold hover:bg-white transition shadow-md">
+                    Login
+                </button>
+                
+                <div id="user-profile-header" class="hidden flex items-center gap-3 cursor-pointer" onclick="toggleUserMenu()">
+                    <span id="user-name-display" class="hidden md:block text-sm text-gray-200">User</span>
+                    <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-primary font-bold">
+                        <img id="user-avatar" src="" onerror="this.style.display='none'" class="w-full h-full rounded-full hidden">
+                        <i id="user-icon-default" class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+
+                <div id="user-menu-dropdown" class="absolute top-12 right-0 bg-white text-gray-800 shadow-xl rounded-lg w-48 py-2 hidden">
+                    <a href="#" id="nav-profile-link" onclick="openProfileModal(); toggleUserMenu()" class="hidden px-4 py-2 hover:bg-gray-100"><i class="fa-solid fa-id-card mr-2"></i> Profile</a>
+                    <a href="#" id="nav-orders-link" onclick="openOrdersModal(); toggleUserMenu()" class="hidden px-4 py-2 hover:bg-gray-100"><i class="fa-solid fa-box-open mr-2"></i> My Orders</a>
+                    
+                    <div id="nav-divider" class="hidden border-t my-1"></div>
+                    <a href="#" onclick="logoutUser(); toggleUserMenu()" class="block px-4 py-2 text-red-600 hover:bg-gray-100"><i class="fa-solid fa-right-from-bracket mr-2"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="drawer-overlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity"></div>
+    <aside id="drawer" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl z-50 transform -translate-x-full pt-20">
+        <button onclick="toggleDrawer(false)" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+        
+        <div class="px-6 pb-6 border-b border-gray-100">
+            <h2 class="text-xl font-bold text-primary brand-font">Menu</h2>
+        </div>
+
+        <nav class="p-4 space-y-2">
+            <a href="#home" class="flex items-center gap-4 px-4 py-3 text-gray-700 hover:bg-accent hover:text-primary rounded-lg transition" onclick="toggleDrawer(false)">
+                <i class="fa-solid fa-house w-6 text-center"></i> Home
+            </a>
+            <a href="#products" class="flex items-center gap-4 px-4 py-3 text-gray-700 hover:bg-accent hover:text-primary rounded-lg transition" onclick="toggleDrawer(false)">
+                <i class="fa-solid fa-leaf w-6 text-center"></i> Products
+            </a>
+            <a href="#" onclick="openCartModal(); toggleDrawer(false);" class="flex items-center gap-4 px-4 py-3 text-gray-700 hover:bg-accent hover:text-primary rounded-lg transition">
+                <i class="fa-solid fa-cart-shopping w-6 text-center"></i> Cart
+            </a>
+            <div id="drawer-user-links" class="hidden border-t pt-2 mt-2">
+                <a href="#" id="drawer-profile-link" onclick="openProfileModal(); toggleDrawer(false);" class="hidden items-center gap-4 px-4 py-3 text-gray-700 hover:bg-accent hover:text-primary rounded-lg transition">
+                    <i class="fa-solid fa-id-card w-6 text-center"></i> My Profile
+                </a>
+                <a href="#" id="drawer-orders-link" onclick="openOrdersModal(); toggleDrawer(false);" class="hidden items-center gap-4 px-4 py-3 text-gray-700 hover:bg-accent hover:text-primary rounded-lg transition">
+                    <i class="fa-solid fa-box-open w-6 text-center"></i> My Orders
+                </a>
+            </div>
+        </nav>
+
+        <div class="absolute bottom-0 w-full p-4 border-t bg-gray-50">
+            <p class="text-xs text-center text-gray-400">© 2023 RS Dry Fruits</p>
+        </div>
+    </aside>
+
+    <main class="pt-20 pb-10 px-4 max-w-7xl mx-auto min-h-screen">
+        
+        <section id="home" class="mb-12 rounded-2xl overflow-hidden shadow-xl relative h-64 md:h-80 bg-gray-900">
+            <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=2070&auto=format&fit=crop" alt="Dry Fruits" class="w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-2 brand-font">Premium Quality</h2>
+                <p class="text-secondary text-lg font-medium">Nutritious Dry Fruits & Organic Millets</p>
+                <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})" class="mt-6 bg-secondary text-primary px-6 py-2 rounded-full font-bold hover:bg-white transition">Shop Now</button>
+            </div>
+        </section>
+
+        <div id="products">
+            <div class="flex justify-between items-end mb-6 border-b-2 border-secondary pb-1">
+                <h3 class="text-2xl font-bold text-primary brand-font">Featured Products</h3>
+                <button onclick="window.location.reload()" class="text-xs text-gray-500 hover:text-primary"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            
+            <div id="products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 min-h-[200px]">
+                <div class="col-span-2 md:col-span-4 flex justify-center items-center h-40">
+                    <div class="spinner border-primary"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('cart-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl p-4">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto hide-scrollbar flex flex-col md:flex-row gap-6">
+                
+                <button onclick="toggleModal('cart-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+                <div class="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-200 pr-0 md:pr-4">
+                    <h2 class="text-xl font-bold text-primary mb-4 brand-font">Your Cart</h2>
+                    <div id="cart-items-container" class="space-y-4 mb-4">
+                        <p class="text-gray-500 text-center py-4">Your cart is empty.</p>
+                    </div>
+                    <div class="flex justify-between items-center pt-4 border-t border-gray-300">
+                        <span class="font-bold text-gray-700">Total</span>
+                        <span id="cart-total-price" class="text-xl font-bold text-primary">₹0</span>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2">
+                    <h2 class="text-xl font-bold text-primary mb-4 brand-font">Shipping Details</h2>
+                    <form onsubmit="handlePlaceOrder(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Name</label>
+                            <input type="text" id="checkout-name" required class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none bg-white" placeholder="Full Name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Phone</label>
+                            <input type="tel" id="checkout-phone" required class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Mobile Number">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Email (For Order Tracking)</label>
+                            <input type="email" id="checkout-email" required class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary text-sm outline-none bg-white" placeholder="email@example.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Address</label>
+                            <div class="flex gap-2 mb-2">
+                                <button type="button" onclick="getCheckoutLocation()" class="flex-1 bg-secondary text-primary text-[10px] font-bold py-1.5 rounded hover:bg-yellow-400 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-location-crosshairs"></i> Get Current Location
+                                </button>
+                            </div>
+                            <textarea id="checkout-address" required rows="2" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-1 focus:ring-primary outline-none text-sm" placeholder="Delivery Address"></textarea>
+                        </div>
+                        
+                        <div id="order-loader" class="hidden flex justify-center py-2">
+                            <div class="spinner-sm"></div>
+                        </div>
+
+                        <button type="submit" id="place-order-btn" class="w-full bg-primary text-white py-2.5 rounded-lg font-bold hover:bg-emerald-800 transition shadow-lg mt-2">
+                            Confirm Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('profile-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative">
+                <button onclick="toggleModal('profile-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                
+                <div class="flex flex-col items-center mb-6">
+                    <div class="w-20 h-20 bg-primary text-secondary rounded-full flex items-center justify-center text-4xl mb-3 overflow-hidden">
+                        <img id="profile-modal-img" src="" onerror="this.style.display='none'" class="w-full h-full object-cover hidden">
+                        <i id="profile-modal-icon" class="fa-solid fa-user"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary brand-font" id="profile-name">User Name</h2>
+                    <p class="text-gray-500 text-sm" id="profile-email">email@example.com</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Phone</label>
+                        <p id="profile-phone" class="font-medium">Not Set</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Saved Address</label>
+                        <p id="profile-address" class="text-sm">Not Set</p>
+                    </div>
+                </div>
+                
+                <button onclick="logoutUser()" class="w-full mt-6 border border-red-500 text-red-500 py-2 rounded-lg font-bold hover:bg-red-50 transition">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="orders-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('orders-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl p-4">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative max-h-[85vh] overflow-y-auto hide-scrollbar">
+                <button onclick="toggleModal('orders-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                
+                <h2 class="text-2xl font-bold text-primary mb-6 brand-font border-b pb-2">My Order History</h2>
+                
+                <div id="orders-list-container" class="space-y-4">
+                    <div class="flex justify-center py-8">
+                        <div class="spinner border-primary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('login-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
+            <div class="glass rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+                <div id="login-process-loader" class="modal-loader hidden">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="spinner border-primary"></div>
+                        <p class="text-sm font-bold text-gray-600">Signing in...</p>
+                    </div>
+                </div>
+
+                <button onclick="toggleModal('login-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                
+                <h2 class="text-2xl font-bold text-primary text-center mb-6 brand-font">Sign In</h2>
+                
+                <p class="text-center text-gray-600 mb-6 text-sm">Please sign in with Google to continue.</p>
+
+                <button onclick="handleGoogleSignIn()" class="w-full bg-white text-gray-700 border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center gap-3 shadow-sm">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6"> 
+                    <span class="text-base">Sign in with Google</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        // Import only Realtime Database functions
+        import { getDatabase, ref, onValue, set, get, push, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCu_WUd66NRLa_8uI06UXVTlkDh74dMBqU",
+            authDomain: "vasanth-ee54c.firebaseapp.com",
+            databaseURL: "https://vasanth-ee54c-default-rtdb.firebaseio.com",
+            projectId: "vasanth-ee54c",
+            storageBucket: "vasanth-ee54c.firebasestorage.app",
+            messagingSenderId: "668556425496",
+            appId: "1:668556425496:web:1b3aab6bf95a5baa19c66d",
+            measurementId: "G-8R23976J89",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const rtdb = getDatabase(app);
+
+        // Global State
+        window.cart = {}; 
+        window.productsMap = {};
+        window.currentUserData = null; // Will store basic user info from Google
+
+        // --- 2. UI HELPERS ---
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-green-600"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-600"></i>';
+            toast.innerHTML = `${icon} <span class="font-medium text-sm text-gray-700">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        window.toggleDrawer = (isOpen) => {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (isOpen) {
+                drawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        window.toggleModal = (modalId, isOpen) => {
+            const modal = document.getElementById(modalId);
+            if(isOpen) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        };
+
+        window.toggleUserMenu = () => {
+            const menu = document.getElementById('user-menu-dropdown');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- 3. PRODUCTS & CART LOGIC (RTDB) ---
+        
+        const renderProductCard = (product) => {
+            const subtitle = product.category || product.description || 'Std Pack';
+            const cartItem = window.cart[product.id];
+            const qty = cartItem ? cartItem.qty : 0;
+
+            let buttonHtml = '';
+            if (qty === 0) {
+                buttonHtml = `
+                    <button onclick="addToCart('${product.id}')" class="bg-primary text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-800 transition shadow-md w-full">
+                        Add to Cart
+                    </button>
+                `;
+            } else {
+                buttonHtml = `
+                    <div class="flex items-center justify-between bg-secondary rounded-full w-full px-1 py-0.5 shadow-md">
+                        <button onclick="changeQty('${product.id}', -1)" class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold hover:bg-gray-100">-</button>
+                        <span class="text-primary font-bold text-xs mx-2">${qty}</span>
+                        <button onclick="changeQty('${product.id}', 1)" class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold hover:bg-gray-100">+</button>
+                    </div>
+                `;
+            }
+
+            const imgSrc = product.image || 'https://placehold.co/400x300?text=No+Image';
+
+            return `
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition flex flex-col h-full">
+                    <div class="h-40 bg-gray-100 relative group">
+                        <img src="${imgSrc}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" class="w-full h-full object-cover transition duration-300 group-hover:scale-110">
+                    </div>
+                    <div class="p-3 flex flex-col flex-grow">
+                        <h4 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h4>
+                        <p class="text-xs text-gray-500 mb-2 truncate">${subtitle}</p>
+                        <div class="mt-auto flex justify-between items-center gap-2">
+                            <span class="text-primary font-bold text-sm">₹${product.price}</span>
+                            <div class="flex-1 max-w-[100px]">
+                                ${product.stock > 0 ? buttonHtml : '<span class="text-xs text-red-500 font-bold">Out of Stock</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const updateGrid = () => {
+            const grid = document.getElementById('products-grid');
+            if(!grid) return;
+            const products = Object.values(window.productsMap);
+            if(products.length > 0) {
+                grid.innerHTML = products.map(renderProductCard).join('');
+            }
+        };
+
+        const fetchProducts = () => {
+            const grid = document.getElementById('products-grid');
+            const productsRef = ref(rtdb, 'products');
+
+            onValue(productsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    window.productsMap = {};
+                    Object.entries(data).forEach(([key, value]) => {
+                        window.productsMap[key] = { id: key, ...value };
+                    });
+                    updateGrid();
+                } else {
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No products found.</p>';
+                }
+            }, (error) => {
+                console.error("Error fetching products:", error);
+                grid.innerHTML = `<p class="col-span-full text-center text-red-500">Failed to load products.</p>`;
+            });
+        };
+
+        window.addToCart = (id) => {
+            const product = window.productsMap[id];
+            
+            if(!product || product.stock <= 0) {
+                 window.showToast("This item is currently out of stock", "error");
+                 return;
+            }
+
+            if(!window.cart[id]) {
+                window.cart[id] = { qty: 1 };
+            }
+            updateCartUI();
+        };
+
+        window.changeQty = (id, change) => {
+            const product = window.productsMap[id];
+            if(!window.cart[id] || !product) return;
+            
+            const currentQty = window.cart[id].qty;
+            const newQty = currentQty + change;
+
+            if (change > 0 && newQty > product.stock) {
+                window.showToast(`Only ${product.stock} items available in stock`, "error");
+                return;
+            }
+
+            window.cart[id].qty = newQty;
+
+            if(window.cart[id].qty <= 0) {
+                delete window.cart[id];
+            }
+            updateCartUI();
+        };
+
+        const updateCartUI = () => {
+            const totalQty = Object.values(window.cart).reduce((acc, item) => acc + item.qty, 0);
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.innerText = totalQty;
+                if(totalQty > 0) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+            updateGrid();
+            renderCartModalItems();
+        };
+
+        // --- 4. CART POPUP & CHECKOUT ---
+
+        window.openCartModal = () => {
+            window.toggleModal('cart-modal', true);
+            renderCartModalItems();
+            
+            // Auto Fill logic if logged in
+            const user = auth.currentUser;
+            const nameInput = document.getElementById('checkout-name');
+            const phoneInput = document.getElementById('checkout-phone');
+            const emailInput = document.getElementById('checkout-email');
+            const addrInput = document.getElementById('checkout-address');
+
+            if (user) {
+                emailInput.value = user.email || '';
+                emailInput.readOnly = false; 
+                nameInput.value = user.displayName || '';
+                
+                // Since we removed manual registration, phone/address are only available if stored in an external user record
+                // or checking previous orders. For now, we leave them blank for the user to fill.
+                if(window.currentUserData) {
+                    phoneInput.value = window.currentUserData.phone || '';
+                    addrInput.value = window.currentUserData.address || '';
+                }
+            } else {
+                if(!nameInput.value) nameInput.value = '';
+                if(!phoneInput.value) phoneInput.value = '';
+                if(!emailInput.value) emailInput.value = '';
+                if(!addrInput.value) addrInput.value = '';
+                emailInput.readOnly = false;
+            }
+        };
+
+        const renderCartModalItems = () => {
+            const container = document.getElementById('cart-items-container');
+            const totalDisplay = document.getElementById('cart-total-price');
+            
+            if(Object.keys(window.cart).length === 0) {
+                container.innerHTML = '<div class="flex flex-col items-center justify-center py-10 opacity-50"><i class="fa-solid fa-basket-shopping text-4xl mb-2"></i><p>Your cart is empty</p></div>';
+                totalDisplay.innerText = "₹0";
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+
+            Object.entries(window.cart).forEach(([id, item]) => {
+                const product = window.productsMap[id];
+                if(product) {
+                    const lineTotal = product.price * item.qty;
+                    total += lineTotal;
+                    html += `
+                        <div class="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
+                            <img src="${product.image || 'https://placehold.co/50'}" class="w-12 h-12 object-cover rounded bg-white">
+                            <div class="flex-1">
+                                <h5 class="font-bold text-sm text-gray-800 line-clamp-1">${product.name}</h5>
+                                <p class="text-xs text-gray-500">₹${product.price} x ${item.qty}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeQty('${id}', -1)" class="w-6 h-6 rounded bg-white border text-primary font-bold shadow hover:bg-gray-100">-</button>
+                                <span class="text-sm font-bold w-4 text-center">${item.qty}</span>
+                                <button onclick="changeQty('${id}', 1)" class="w-6 h-6 rounded bg-white border text-primary font-bold shadow hover:bg-gray-100">+</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+            totalDisplay.innerText = "₹" + total;
+        };
+
+        // NEW: Check order history to toggle menu visibility
+        window.checkOrderHistory = async (email) => {
+            if(!email) return;
+
+            const navProfile = document.getElementById('nav-profile-link');
+            const navOrders = document.getElementById('nav-orders-link');
+            const navDivider = document.getElementById('nav-divider');
+            const drawerProfile = document.getElementById('drawer-profile-link');
+            const drawerOrders = document.getElementById('drawer-orders-link');
+            const drawerContainer = document.getElementById('drawer-user-links');
+
+            try {
+                const ordersRef = ref(rtdb, 'orders');
+                const snapshot = await get(ordersRef);
+                
+                let hasOrders = false;
+                if(snapshot.exists()) {
+                    const allOrders = snapshot.val();
+                    const myOrders = Object.values(allOrders).filter(order => order.email === email);
+                    if(myOrders.length > 0) {
+                        hasOrders = true;
+                        // Use latest order to populate profile if available
+                        const latest = myOrders.sort((a,b) => b.orderDate - a.orderDate)[0];
+                        window.currentUserData = {
+                            name: latest.customerName,
+                            phone: latest.customerPhone,
+                            address: latest.address,
+                            email: latest.email
+                        };
+                    }
+                }
+
+                if(hasOrders) {
+                    // UNHIDE ELEMENTS
+                    navProfile.classList.remove('hidden');
+                    navOrders.classList.remove('hidden');
+                    navProfile.classList.add('block');
+                    navOrders.classList.add('block');
+                    navDivider.classList.remove('hidden');
+
+                    drawerContainer.classList.remove('hidden');
+                    drawerProfile.classList.remove('hidden');
+                    drawerOrders.classList.remove('hidden');
+                    drawerProfile.classList.add('flex');
+                    drawerOrders.classList.add('flex');
+                } else {
+                    // HIDE ELEMENTS (Ensure they remain hidden if 0 orders)
+                    navProfile.classList.add('hidden');
+                    navOrders.classList.add('hidden');
+                    navProfile.classList.remove('block');
+                    navOrders.classList.remove('block');
+                    navDivider.classList.add('hidden');
+
+                    drawerContainer.classList.add('hidden');
+                }
+
+            } catch (e) {
+                console.error("Error checking order history:", e);
+            }
+        };
+
+        window.handlePlaceOrder = async (e) => {
+            e.preventDefault();
+            
+            if(Object.keys(window.cart).length === 0) {
+                window.showToast("Cart is empty", "error");
+                return;
+            }
+
+            const loader = document.getElementById('order-loader');
+            const btn = document.getElementById('place-order-btn');
+            loader.classList.remove('hidden');
+            btn.classList.add('hidden');
+
+            const name = document.getElementById('checkout-name').value;
+            const phone = document.getElementById('checkout-phone').value;
+            const email = document.getElementById('checkout-email').value;
+            const address = document.getElementById('checkout-address').value;
+            const total = document.getElementById('cart-total-price').innerText;
+
+            const items = Object.entries(window.cart).map(([id, item]) => {
+                const prod = window.productsMap[id];
+                return {
+                    id: id,
+                    name: prod.name,
+                    price: prod.price,
+                    qty: item.qty,
+                    subtotal: prod.price * item.qty
+                };
+            });
+
+            // Store in RTDB under 'orders'
+            const orderData = {
+                customerName: name,
+                customerPhone: phone,
+                email: email, 
+                address: address,
+                items: items,
+                totalAmount: total,
+                orderDate: Date.now(),
+                status: 'Pending'
+            };
+
+            try {
+                // 1. Save Order to RTDB
+                const newOrderRef = push(ref(rtdb, 'orders'));
+                await set(newOrderRef, orderData);
+                
+                // 2. Update Stock in RTDB (Decrement stock)
+                for (const item of items) {
+                     const currentProd = window.productsMap[item.id];
+                     if(currentProd) {
+                         const newStock = Math.max(0, currentProd.stock - item.qty);
+                         await update(ref(rtdb, `products/${item.id}`), {
+                             stock: newStock
+                         });
+                     }
+                }
+
+                window.showToast(`Order Placed Successfully! Total: ${total}`);
+                
+                // 3. IMPORTANT: Update UI to show Profile/Orders immediately
+                await checkOrderHistory(email);
+
+                // Clear Cart
+                window.cart = {};
+                updateCartUI();
+                window.toggleModal('cart-modal', false);
+
+            } catch (error) {
+                console.error("Order Error: ", error);
+                window.showToast("Failed to place order. Try again.", "error");
+            } finally {
+                loader.classList.add('hidden');
+                btn.classList.remove('hidden');
+            }
+        };
+
+        // --- 5. LOCATION (Checkout) ---
+        window.getCheckoutLocation = () => {
+             if (!navigator.geolocation) {
+                window.showToast("Geolocation is not supported.", "error");
+                return;
+            }
+            const btn = document.querySelector('button[onclick="getCheckoutLocation()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const addressField = document.getElementById('checkout-address');
+                    const currentVal = addressField.value ? addressField.value + "\n" : "";
+                    addressField.value = `${currentVal}Location: ${lat}, ${lng}`;
+                    window.showToast("Location added to address!");
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Done';
+                    setTimeout(() => btn.innerHTML = originalText, 2000);
+                },
+                (error) => {
+                    window.showToast("Please turn on your location", "error");
+                    btn.innerHTML = originalText;
+                }
+            );
+        };
+
+        // --- 6. PROFILE & ORDERS VIEWS (RTDB) ---
+
+        window.openProfileModal = () => {
+            if(!auth.currentUser) {
+                window.showToast("Please login to view profile", "error");
+                window.toggleModal('login-modal', true);
+                return;
+            }
+            
+            document.getElementById('profile-name').innerText = auth.currentUser.displayName || 'User';
+            document.getElementById('profile-email').innerText = auth.currentUser.email;
+            
+            // Photo
+            const imgEl = document.getElementById('profile-modal-img');
+            const iconEl = document.getElementById('profile-modal-icon');
+            if(auth.currentUser.photoURL) {
+                imgEl.src = auth.currentUser.photoURL;
+                imgEl.style.display = 'block';
+                imgEl.classList.remove('hidden');
+                iconEl.style.display = 'none';
+            } else {
+                 imgEl.style.display = 'none';
+                 iconEl.style.display = 'block';
+            }
+
+            // Data from last order (if any)
+            if(window.currentUserData) {
+                document.getElementById('profile-phone').innerText = window.currentUserData.phone || 'Not Set';
+                document.getElementById('profile-address').innerText = window.currentUserData.address || 'Not Set';
+            }
+
+            window.toggleModal('profile-modal', true);
+        }
+
+        window.openOrdersModal = async () => {
+            if(!auth.currentUser) {
+                window.showToast("Please login to view orders", "error");
+                window.toggleModal('login-modal', true);
+                return;
+            }
+            
+            window.toggleModal('orders-modal', true);
+            const container = document.getElementById('orders-list-container');
+            container.innerHTML = '<div class="flex justify-center py-8"><div class="spinner border-primary"></div></div>';
+
+            try {
+                // Fetch orders from RTDB
+                const ordersRef = ref(rtdb, 'orders');
+                const snapshot = await get(ordersRef);
+                
+                if(!snapshot.exists()) {
+                    container.innerHTML = '<p class="text-center text-gray-500 py-4">No orders found.</p>';
+                    return;
+                }
+
+                const allOrders = snapshot.val();
+                const myOrders = Object.values(allOrders)
+                    .filter(order => order.email === auth.currentUser.email)
+                    .sort((a, b) => b.orderDate - a.orderDate); 
+
+                if(myOrders.length === 0) {
+                     container.innerHTML = '<p class="text-center text-gray-500 py-4">No orders found for this account.</p>';
+                     return;
+                }
+
+                let html = '';
+                myOrders.forEach((data) => {
+                    const date = data.orderDate ? new Date(data.orderDate).toLocaleDateString() + ' ' + new Date(data.orderDate).toLocaleTimeString() : 'Recent';
+                    
+                    let itemsHtml = data.items.map(i => `
+                        <div class="flex justify-between text-xs text-gray-600">
+                            <span>${i.name} x ${i.qty}</span>
+                            <span>₹${i.subtotal}</span>
+                        </div>
+                    `).join('');
+
+                    html += `
+                        <div class="bg-gray-50 rounded-lg p-4 border hover:shadow-md transition">
+                            <div class="flex justify-between items-center mb-2 border-b pb-2">
+                                <span class="text-xs font-bold text-gray-500">${date}</span>
+                                <span class="text-sm font-bold text-primary">${data.totalAmount}</span>
+                            </div>
+                            <div class="space-y-1 mb-2">
+                                ${itemsHtml}
+                            </div>
+                            <div class="text-xs text-right">
+                                <span class="px-2 py-1 rounded bg-secondary text-primary font-bold text-[10px]">${data.status || 'Received'}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                container.innerHTML = '<p class="text-center text-red-500 py-4">Failed to load history.</p>';
+            }
+        }
+
+        // --- 7. AUTH HANDLERS ---
+        onAuthStateChanged(auth, async (user) => {
+            const loginBtn = document.getElementById('login-btn-header');
+            const profileArea = document.getElementById('user-profile-header');
+            
+            // Header Elements
+            const avatarImg = document.getElementById('user-avatar');
+            const defaultIcon = document.getElementById('user-icon-default');
+
+            if (user) {
+                loginBtn.classList.add('hidden');
+                profileArea.classList.remove('hidden');
+                profileArea.classList.add('flex');
+                document.getElementById('user-name-display').innerText = user.displayName || 'User';
+                
+                if(user.photoURL) {
+                    avatarImg.src = user.photoURL;
+                    avatarImg.classList.remove('hidden');
+                    avatarImg.style.display = 'block';
+                    defaultIcon.classList.add('hidden');
+                } else {
+                     avatarImg.classList.add('hidden');
+                     defaultIcon.classList.remove('hidden');
+                }
+
+                // Check for existing orders to determine visibility of "Profile" & "My Orders"
+                await checkOrderHistory(user.email);
+
+                window.toggleModal('login-modal', false);
+            } else {
+                loginBtn.classList.remove('hidden');
+                profileArea.classList.add('hidden');
+                profileArea.classList.remove('flex');
+                
+                // Hide user-specific links
+                document.getElementById('nav-profile-link').classList.add('hidden');
+                document.getElementById('nav-orders-link').classList.add('hidden');
+                document.getElementById('drawer-user-links').classList.add('hidden');
+                
+                window.currentUserData = null;
+            }
+        });
+
+        window.handleGoogleSignIn = async () => {
+            const loader = document.getElementById('login-process-loader');
+            loader.classList.remove('hidden'); 
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                window.showToast("Google Sign-In Successful!");
+            } catch (error) {
+                window.showToast("Google Sign-In failed: " + error.message, "error");
+            } finally {
+                loader.classList.add('hidden');
+            }
+        };
+
+        window.logoutUser = async () => {
+            try {
+                await signOut(auth);
+                window.cart = {}; 
+                updateCartUI();
+                window.showToast("Logged out successfully");
+                window.toggleModal('profile-modal', false);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        // --- 8. INITIALIZATION ---
+        window.addEventListener('load', () => {
+            fetchProducts();
+            setTimeout(() => {
+                const loader = document.getElementById('loader-overlay');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 1000);
+        });
+
+    </script>
+</body>
 </html>
