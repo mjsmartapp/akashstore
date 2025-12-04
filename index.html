@@ -488,7 +488,6 @@
             const qty = cartItem ? cartItem.qty : 0;
             
             // --- UPDATED: UNIT DISPLAY LOGIC ---
-            // Specifically looks for 'unit' or 'weight' based on your JSON
             const unit = product.unit || product.weight || ''; 
             const unitDisplay = unit ? `<span class="text-xs text-gray-500 font-normal ml-1">/ ${unit}</span>` : '';
             // -----------------------------------
@@ -654,54 +653,89 @@
             const btn = document.getElementById('place-order-btn');
             loader.classList.remove('hidden'); btn.classList.add('hidden');
 
-            const name = document.getElementById('checkout-name').value;
-            const email = document.getElementById('checkout-email').value;
-            const manualAddr = document.getElementById('checkout-address').value;
-            const gpsLoc = document.getElementById('checkout-location').value;
-            const total = document.getElementById('cart-total-price').innerText;
-
-            // Combine manual address and GPS location
-            let fullAddress = manualAddr;
-            if(gpsLoc) fullAddress += `\n[GPS: ${gpsLoc}]`;
-
-            const items = Object.entries(window.cart).map(([id, item]) => {
-                const prod = window.productsMap[id];
-                return { 
-                    id: id, 
-                    name: prod.name, 
-                    price: prod.price, 
-                    unit: prod.unit || prod.weight || '', // Save unit to order history
-                    qty: item.qty, 
-                    subtotal: prod.price * item.qty 
-                };
-            });
-
-            const orderData = {
-                customerName: name,
-                customerPhone: phone,
-                email: email, 
-                address: fullAddress,
-                items: items,
-                totalAmount: total,
-                orderDate: Date.now(),
-                status: 'Pending'
-            };
-
             try {
+                // --- NEW LOGIC: VALIDATE LIVE STOCK BEFORE CONFIRMING ---
+                const updates = {};
+                const cartItems = Object.entries(window.cart);
+                let stockError = false;
+                let errorMsg = "";
+
+                // Check stock for each item in the cart
+                for (const [id, item] of cartItems) {
+                    const productRef = ref(rtdb, `products/${id}`);
+                    const snapshot = await get(productRef);
+                    
+                    if (!snapshot.exists()) {
+                        stockError = true;
+                        errorMsg = `Product not found: ${id}`;
+                        break;
+                    }
+
+                    const productData = snapshot.val();
+                    const currentStock = productData.stock || 0;
+
+                    if (item.qty > currentStock) {
+                        stockError = true;
+                        errorMsg = `Insufficient stock for ${productData.name}. Available: ${currentStock}`;
+                        break;
+                    }
+
+                    // Prepare stock update path (optimistic locking would be better in prod, but simple calc is ok here)
+                    updates[`products/${id}/stock`] = currentStock - item.qty;
+                }
+
+                if (stockError) {
+                    window.showToast(errorMsg, "error");
+                    loader.classList.add('hidden'); 
+                    btn.classList.remove('hidden');
+                    return; // HALT THE ORDER
+                }
+                // --------------------------------------------------------
+
+                const name = document.getElementById('checkout-name').value;
+                const email = document.getElementById('checkout-email').value;
+                const manualAddr = document.getElementById('checkout-address').value;
+                const gpsLoc = document.getElementById('checkout-location').value;
+                const total = document.getElementById('cart-total-price').innerText;
+
+                // Combine manual address and GPS location
+                let fullAddress = manualAddr;
+                if(gpsLoc) fullAddress += `\n[GPS: ${gpsLoc}]`;
+
+                const items = cartItems.map(([id, item]) => {
+                    const prod = window.productsMap[id];
+                    return { 
+                        id: id, 
+                        name: prod.name, 
+                        price: prod.price, 
+                        unit: prod.unit || prod.weight || '', 
+                        qty: item.qty, 
+                        subtotal: prod.price * item.qty 
+                    };
+                });
+
+                const orderData = {
+                    customerName: name,
+                    customerPhone: phone,
+                    email: email, 
+                    address: fullAddress,
+                    items: items,
+                    totalAmount: total,
+                    orderDate: Date.now(),
+                    status: 'Pending'
+                };
+
+                // Push new order
                 const newOrderRef = push(ref(rtdb, 'orders'));
                 await set(newOrderRef, orderData);
                 
-                // Update Stock
-                for (const item of items) {
-                     const currentProd = window.productsMap[item.id];
-                     if(currentProd) {
-                         const newStock = Math.max(0, currentProd.stock - item.qty);
-                         await update(ref(rtdb, `products/${item.id}`), { stock: newStock });
-                     }
-                }
+                // Commit stock updates to database
+                await update(ref(rtdb), updates);
+
                 window.showToast(`Order Placed Successfully! Total: ${total}`);
                 await checkOrderHistory(email);
                 window.cart = {}; updateCartUI(); window.toggleModal('cart-modal', false);
+
             } catch (error) {
                 console.error("Order Error: ", error); window.showToast("Failed to place order.", "error");
             } finally {
