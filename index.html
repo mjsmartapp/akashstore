@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RS Dry Fruits & Millets</title>
+    <title>RS Dry Fruits</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -127,7 +127,7 @@
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 flex flex-col min-h-screen">
 
     <div id="loader-overlay">
         <div class="flex flex-col items-center">
@@ -152,7 +152,7 @@
             </div>
 
             <div class="w-2/4 text-center">
-                <h1 class="text-sm md:text-lg font-bold tracking-wider truncate text-secondary">RS DRY FRUITS & MILLETS</h1>
+                <h1 class="text-sm md:text-lg font-bold tracking-wider truncate text-secondary">RS DRY FRUITS</h1>
             </div>
 
             <div class="w-1/4 flex justify-end relative">
@@ -214,7 +214,7 @@
         </div>
     </aside>
 
-    <main class="pt-20 pb-10 px-4 max-w-7xl mx-auto min-h-screen">
+    <main class="pt-20 pb-10 px-4 max-w-7xl mx-auto flex-grow w-full">
         
         <section id="home" class="mb-12 rounded-2xl overflow-hidden shadow-xl relative h-64 md:h-80 bg-gray-900">
             <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=2070&auto=format&fit=crop" alt="Dry Fruits" class="w-full h-full object-cover opacity-60">
@@ -238,6 +238,111 @@
             </div>
         </div>
     </main>
+
+    <footer class="bg-primary text-white pt-10 pb-6 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold brand-font text-secondary mb-4">RS Dry Fruits</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Bringing you the finest selection of premium dry fruits, nuts, and organic millets for a healthier lifestyle.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-lg mb-4 text-secondary">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" onclick="toggleModal('about-modal', true)" class="hover:text-secondary transition">About Us</a></li>
+                        <li><a href="#" onclick="toggleModal('terms-modal', true)" class="hover:text-secondary transition">Terms & Conditions</a></li>
+                        <li><a href="#" onclick="toggleModal('privacy-modal', true)" class="hover:text-secondary transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-lg mb-4 text-secondary">Contact Us</h4>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-secondary"></i> 
+                            <span>+91 98765 43210</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-secondary"></i> 
+                            <span>support@rsdryfruits.com</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-secondary mt-1"></i> 
+                            <span>123, Main Market Road,<br>Tamil Nadu, India</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-lg mb-4 text-secondary">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-secondary hover:text-primary transition">
+                            <i class="fa-brands fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-secondary hover:text-primary transition">
+                            <i class="fa-brands fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white bg-opacity-10 flex items-center justify-center hover:bg-secondary hover:text-primary transition">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-10 pt-6 text-center text-xs text-gray-400">
+                <p>Designed by : <a href="https://www.mjsmartapps.xyz" target="_blank" class="text-secondary hover:text-white transition font-bold">MJ SMART APPS</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="about-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('about-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-4">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+                <button onclick="toggleModal('about-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h2 class="text-2xl font-bold text-primary mb-4 brand-font">About Us</h2>
+                <div class="text-sm text-gray-600 space-y-3">
+                    <p>Welcome to RS Dry Fruits & Millets, your number one source for all things healthy and nutritious. We're dedicated to giving you the very best of dry fruits, with a focus on quality, organic sourcing, and customer satisfaction.</p>
+                    <p>Founded in 2023, RS Dry Fruits has come a long way from its beginnings. When we first started out, our passion for eco-friendly and healthy food drove us to do tons of research so that RS Dry Fruits can offer you the world's most advanced organic foods.</p>
+                    <p>We hope you enjoy our products as much as we enjoy offering them to you. If you have any questions or comments, please don't hesitate to contact us.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="terms-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('terms-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-4">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+                <button onclick="toggleModal('terms-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h2 class="text-2xl font-bold text-primary mb-4 brand-font">Terms & Conditions</h2>
+                <div class="text-sm text-gray-600 space-y-3">
+                    <p><strong>1. Introduction</strong><br>By using our website, you agree to be bound by these terms and conditions.</p>
+                    <p><strong>2. Ordering</strong><br>All orders are subject to availability and confirmation of the order price.</p>
+                    <p><strong>3. Pricing</strong><br>While we try and ensure that all details, descriptions and prices which appear on this Website are accurate, errors may occur.</p>
+                    <p><strong>4. Delivery</strong><br>We aim to deliver items within the specified timeframes, but delays may occur.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacy-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('privacy-modal', false)"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-4">
+            <div class="glass rounded-2xl shadow-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+                <button onclick="toggleModal('privacy-modal', false)" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h2 class="text-2xl font-bold text-primary mb-4 brand-font">Privacy Policy</h2>
+                <div class="text-sm text-gray-600 space-y-3">
+                    <p>Your privacy is important to us. It is RS Dry Fruits' policy to respect your privacy regarding any information we may collect from you across our website.</p>
+                    <p>We only ask for personal information when we truly need it to provide a service to you. We collect it by fair and lawful means, with your knowledge and consent.</p>
+                    <p>We don't share any personally identifying information publicly or with third-parties, except when required to by law.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="cart-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="toggleModal('cart-modal', false)"></div>
