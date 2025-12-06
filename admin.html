@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - RS Dry Fruits</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#064e3b', // Emerald 900
+                        secondary: '#fbbf24', // Amber 400
+                        accent: '#ecfdf5', // Emerald 50
+                        danger: '#ef4444',
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        
+        /* Sidebar Transition */
+        .sidebar { transition: all 0.3s; }
+        
+        /* Table Styles */
+        .table-row-hover:hover { background-color: #f8fafc; }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: white; border-left: 4px solid #064e3b; padding: 16px;
+            border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 250px; animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Loader */
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid #064e3b; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <div id="auth-overlay" class="fixed inset-0 z-50 bg-primary flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full">
+            <h1 class="text-3xl font-bold brand-font text-primary mb-2">Admin Panel</h1>
+            <p class="text-gray-500 mb-6">RS Dry Fruits Management</p>
+
+            <form onsubmit="handleEmailLogin(event)" class="space-y-4 text-left mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="admin@example.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="••••••••">
+                </div>
+                <button type="submit" id="email-login-btn" class="w-full bg-primary text-white py-2.5 rounded-lg font-bold hover:bg-emerald-800 transition shadow-md">
+                    Login
+                </button>
+            </form>
+
+            <div class="relative flex py-2 items-center mb-6">
+                <div class="flex-grow border-t border-gray-200"></div>
+                <span class="flex-shrink-0 mx-4 text-gray-400 text-xs">OR CONTINUE WITH</span>
+                <div class="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <button onclick="handleGoogleLogin()" class="w-full bg-white border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center gap-3 shadow-sm">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> 
+                <span>Google</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <aside class="w-64 bg-white shadow-xl flex flex-col z-20 hidden md:flex">
+        <div class="h-16 flex items-center justify-center border-b border-gray-100 bg-primary text-white">
+            <h2 class="text-xl font-bold brand-font text-secondary">RS Admin</h2>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-6 py-3 text-primary bg-accent border-r-4 border-primary transition font-medium">
+                        <i class="fa-solid fa-chart-line w-6"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary transition font-medium">
+                        <i class="fa-solid fa-box w-6"></i> Products
+                    </button>
+                </li>
+                <li>
+                    <button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary transition font-medium">
+                        <i class="fa-solid fa-cart-shopping w-6"></i> Orders
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-4">
+                <img id="admin-avatar" src="" onerror="this.src='https://ui-avatars.com/api/?name=Admin&background=064e3b&color=fff'" class="w-10 h-10 rounded-full bg-gray-200 object-cover">
+                <div class="overflow-hidden">
+                    <p id="admin-name" class="text-sm font-bold text-gray-800 truncate">Admin</p>
+                    <p class="text-xs text-gray-500">Administrator</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full text-red-500 bg-red-50 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition">
+                <i class="fa-solid fa-right-from-bracket mr-2"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-primary z-30 flex items-center justify-between px-4 text-white shadow-md">
+        <span class="font-bold brand-font text-secondary">RS Admin</span>
+        <button onclick="toggleMobileMenu()" class="text-xl"><i class="fa-solid fa-bars"></i></button>
+    </div>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleMobileMenu()">
+        <div class="absolute right-0 top-0 bottom-0 w-64 bg-white p-4" onclick="event.stopPropagation()">
+            <nav class="space-y-2 mt-12">
+                <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded hover:bg-gray-100">Dashboard</button>
+                <button onclick="switchTab('products'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded hover:bg-gray-100">Products</button>
+                <button onclick="switchTab('orders'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 rounded hover:bg-gray-100">Orders</button>
+                <button onclick="logout()" class="block w-full text-left px-4 py-3 text-red-500 mt-4 border-t">Logout</button>
+            </nav>
+        </div>
+    </div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden pt-16 md:pt-0">
+        
+        <div id="view-dashboard" class="flex-1 overflow-y-auto p-6 md:p-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 brand-font">Dashboard Overview</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 uppercase">Total Revenue</p>
+                            <h3 class="text-2xl font-bold text-primary mt-1" id="stat-revenue">₹0</h3>
+                        </div>
+                        <div class="p-2 bg-green-100 text-green-600 rounded-lg"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 uppercase">Total Orders</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-orders">0</h3>
+                        </div>
+                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i class="fa-solid fa-bag-shopping"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 uppercase">Products</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-products">0</h3>
+                        </div>
+                        <div class="p-2 bg-yellow-100 text-yellow-600 rounded-lg"><i class="fa-solid fa-box-open"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 uppercase">Pending</p>
+                            <h3 class="text-2xl font-bold text-orange-600 mt-1" id="stat-pending">0</h3>
+                        </div>
+                        <div class="p-2 bg-orange-100 text-orange-600 rounded-lg"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800">Recent Orders</h3>
+                    <button onclick="switchTab('orders')" class="text-sm text-primary font-bold hover:underline">View All</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                            <tr>
+                                <th class="px-6 py-3 font-semibold">Order ID</th>
+                                <th class="px-6 py-3 font-semibold">Customer</th>
+                                <th class="px-6 py-3 font-semibold">Amount</th>
+                                <th class="px-6 py-3 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-orders-table" class="text-sm divide-y divide-gray-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-products" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+            <div class="p-6 md:px-10 md:pt-10 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800 brand-font">Product Management</h2>
+                <button onclick="openProductModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-emerald-800 transition">
+                    <i class="fa-solid fa-plus mr-2"></i> Add Product
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-auto px-6 md:px-10 pb-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
+                    </div>
+            </div>
+        </div>
+
+        <div id="view-orders" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+            <div class="p-6 md:px-10 md:pt-10">
+                <h2 class="text-2xl font-bold text-gray-800 brand-font">Customer Orders</h2>
+            </div>
+            
+            <div class="flex-1 overflow-auto px-6 md:px-10 pb-10">
+                <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-3">Date</th>
+                                    <th class="px-6 py-3">Customer</th>
+                                    <th class="px-6 py-3">Items</th>
+                                    <th class="px-6 py-3">Total</th>
+                                    <th class="px-6 py-3">Address</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-full-table" class="text-sm divide-y divide-gray-200 bg-white">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="product-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                
+                <h2 class="text-xl font-bold text-primary mb-6 brand-font" id="modal-title">Add New Product</h2>
+                
+                <form onsubmit="handleProductSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="prod-id">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Product Name</label>
+                        <input type="text" id="prod-name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none">
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Price (₹)</label>
+                            <input type="number" id="prod-price" required min="1" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Unit (e.g., 500g)</label>
+                            <input type="text" id="prod-unit" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="1 kg">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Stock Qty</label>
+                            <input type="number" id="prod-stock" required min="0" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
+                            <select id="prod-category" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none bg-white">
+                                <option>Dry Fruits</option>
+                                <option>Millets</option>
+                                <option>Spices</option>
+                                <option>Seeds</option>
+                                <option>Combo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
+                        <input type="url" id="prod-image" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="https://...">
+                        <p class="text-[10px] text-gray-400 mt-1">Right click an image on google > Copy Image Address</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                        <textarea id="prod-desc" rows="3" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-emerald-800 transition mt-2">
+                        Save Product
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        // ADDED: signInWithEmailAndPassword to imports
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, push, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCu_WUd66NRLa_8uI06UXVTlkDh74dMBqU",
+            authDomain: "vasanth-ee54c.firebaseapp.com",
+            databaseURL: "https://vasanth-ee54c-default-rtdb.firebaseio.com",
+            projectId: "vasanth-ee54c",
+            storageBucket: "vasanth-ee54c.firebasestorage.app",
+            messagingSenderId: "668556425496",
+            appId: "1:668556425496:web:1b3aab6bf95a5baa19c66d",
+            measurementId: "G-8R23976J89",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // --- GLOBAL UTILS ---
+        window.showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-green-600"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-600"></i>';
+            toast.innerHTML = `${icon} <span class="font-medium text-sm text-gray-700">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // --- AUTH LOGIC ---
+        
+        // Google Sign In
+        window.handleGoogleLogin = async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error(error);
+                window.showToast("Google Login Failed: " + error.message, "error");
+            }
+        };
+
+        // NEW: Email/Password Sign In
+        window.handleEmailLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('email-login-btn');
+            const originalText = btn.innerText;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle the UI redirection
+            } catch (error) {
+                console.error(error);
+                let msg = "Login Failed";
+                if(error.code === 'auth/wrong-password') msg = "Incorrect Password";
+                if(error.code === 'auth/user-not-found') msg = "User not found";
+                window.showToast(msg, "error");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.logout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('auth-overlay').classList.add('hidden');
+                // Use photoURL or fallback avatar
+                const avatar = document.getElementById('admin-avatar');
+                if(user.photoURL) {
+                    avatar.src = user.photoURL;
+                } else {
+                     // Fallback for email users who don't have a photo
+                    avatar.src = `https://ui-avatars.com/api/?name=${user.email}&background=064e3b&color=fff`;
+                }
+                
+                document.getElementById('admin-name').innerText = user.displayName || user.email.split('@')[0];
+                initDashboard();
+            } else {
+                document.getElementById('auth-overlay').classList.remove('hidden');
+                // Reset login button state if returning to login screen
+                const btn = document.getElementById('email-login-btn');
+                if(btn) {
+                    btn.innerText = 'Login';
+                    btn.disabled = false;
+                }
+            }
+        });
+
+        // --- NAVIGATION ---
+        window.switchTab = (tabId) => {
+            // Update Sidebar UI
+            ['dashboard', 'products', 'orders'].forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                if(t === tabId) {
+                    btn.className = "w-full flex items-center gap-3 px-6 py-3 text-primary bg-accent border-r-4 border-primary transition font-medium";
+                } else {
+                    btn.className = "w-full flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary transition font-medium";
+                }
+                
+                const view = document.getElementById(`view-${t}`);
+                if(t === tabId) view.classList.remove('hidden');
+                else view.classList.add('hidden');
+            });
+        };
+
+        window.toggleMobileMenu = () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        };
+
+        // --- DATA HANDLING ---
+        let allOrders = [];
+        let allProducts = {};
+
+        function initDashboard() {
+            // Listen to Products
+            onValue(ref(db, 'products'), (snapshot) => {
+                allProducts = snapshot.val() || {};
+                renderProducts();
+                updateStats();
+            });
+
+            // Listen to Orders
+            onValue(ref(db, 'orders'), (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    allOrders = Object.entries(data).map(([key, val]) => ({...val, id: key}));
+                    // Sort by newest
+                    allOrders.sort((a,b) => b.orderDate - a.orderDate);
+                    renderOrders();
+                    updateStats();
+                } else {
+                    allOrders = [];
+                    renderOrders();
+                }
+            });
+        }
+
+        function updateStats() {
+            let revenue = 0;
+            let pending = 0;
+            
+            allOrders.forEach(o => {
+                // Parse amount properly (remove currency symbol if stored)
+                const amt = parseFloat(o.totalAmount.toString().replace(/[^0-9.]/g, '')) || 0;
+                if(o.status !== 'Cancelled') revenue += amt;
+                if(o.status === 'Pending' || !o.status) pending++;
+            });
+
+            document.getElementById('stat-revenue').innerText = "₹" + revenue.toLocaleString();
+            document.getElementById('stat-orders').innerText = allOrders.length;
+            document.getElementById('stat-products').innerText = Object.keys(allProducts).length;
+            document.getElementById('stat-pending').innerText = pending;
+        }
+
+        // --- PRODUCT LOGIC ---
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            Object.entries(allProducts).forEach(([id, prod]) => {
+                const stockColor = prod.stock > 10 ? 'bg-green-100 text-green-700' : (prod.stock > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700');
+                
+                grid.innerHTML += `
+                    <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden flex flex-col group">
+                        <div class="h-48 relative overflow-hidden bg-gray-100">
+                            <img src="${prod.image}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                            <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold ${stockColor}">
+                                Stock: ${prod.stock}
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="font-bold text-gray-800 line-clamp-1">${prod.name}</h3>
+                            <p class="text-xs text-gray-500 mb-2">${prod.category} • ${prod.unit || ''}</p>
+                            
+                            <div class="mt-auto flex justify-between items-center">
+                                <span class="font-bold text-primary">₹${prod.price}</span>
+                                <div class="flex gap-2">
+                                    <button onclick="editProduct('${id}')" class="w-8 h-8 rounded bg-gray-100 hover:bg-secondary hover:text-primary transition flex items-center justify-center text-gray-600">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button onclick="deleteProduct('${id}')" class="w-8 h-8 rounded bg-red-50 hover:bg-red-500 hover:text-white transition flex items-center justify-center text-red-500">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.openProductModal = (isEdit = false) => {
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('hidden');
+            if(!isEdit) {
+                document.getElementById('modal-title').innerText = "Add New Product";
+                document.getElementById('prod-id').value = "";
+                document.querySelector('form').reset();
+            }
+        };
+
+        window.closeProductModal = () => document.getElementById('product-modal').classList.add('hidden');
+
+        window.editProduct = (id) => {
+            const prod = allProducts[id];
+            if(!prod) return;
+            
+            document.getElementById('modal-title').innerText = "Edit Product";
+            document.getElementById('prod-id').value = id;
+            document.getElementById('prod-name').value = prod.name;
+            document.getElementById('prod-price').value = prod.price;
+            document.getElementById('prod-unit').value = prod.unit || prod.weight || '';
+            document.getElementById('prod-stock').value = prod.stock;
+            document.getElementById('prod-category').value = prod.category || 'Dry Fruits';
+            document.getElementById('prod-image').value = prod.image || '';
+            document.getElementById('prod-desc').value = prod.description || '';
+            
+            window.openProductModal(true);
+        };
+
+        window.handleProductSubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const data = {
+                name: document.getElementById('prod-name').value,
+                price: Number(document.getElementById('prod-price').value),
+                unit: document.getElementById('prod-unit').value,
+                stock: Number(document.getElementById('prod-stock').value),
+                category: document.getElementById('prod-category').value,
+                image: document.getElementById('prod-image').value,
+                description: document.getElementById('prod-desc').value
+            };
+
+            try {
+                if(id) {
+                    await update(ref(db, `products/${id}`), data);
+                    window.showToast("Product Updated!");
+                } else {
+                    await push(ref(db, 'products'), data);
+                    window.showToast("Product Added!");
+                }
+                window.closeProductModal();
+            } catch (err) {
+                console.error(err);
+                window.showToast("Error saving product", "error");
+            }
+        };
+
+        window.deleteProduct = async (id) => {
+            if(confirm("Are you sure you want to delete this product?")) {
+                await remove(ref(db, `products/${id}`));
+                window.showToast("Product Deleted");
+            }
+        };
+
+        // --- ORDER LOGIC ---
+        function renderOrders() {
+            const dashboardTable = document.getElementById('dashboard-orders-table');
+            const fullTable = document.getElementById('orders-full-table');
+            
+            dashboardTable.innerHTML = '';
+            fullTable.innerHTML = '';
+
+            // Dashboard Preview (First 5)
+            allOrders.slice(0, 5).forEach(order => {
+                dashboardTable.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-3 font-medium text-gray-800">#${order.id.slice(-6)}</td>
+                        <td class="px-6 py-3 text-gray-600">${order.customerName}</td>
+                        <td class="px-6 py-3 font-bold text-gray-800">${order.totalAmount}</td>
+                        <td class="px-6 py-3"><span class="text-xs font-bold px-2 py-1 rounded ${getStatusColor(order.status)}">${order.status || 'Pending'}</span></td>
+                    </tr>
+                `;
+            });
+
+            // Full Table
+            allOrders.forEach(order => {
+                const date = new Date(order.orderDate).toLocaleDateString() + ' ' + new Date(order.orderDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const itemsList = order.items.map(i => `<div class="text-xs">${i.name} (${i.qty})</div>`).join('');
+                
+                fullTable.innerHTML += `
+                    <tr class="table-row-hover border-b border-gray-100 last:border-0">
+                        <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">${date}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-bold text-gray-800">${order.customerName}</div>
+                            <div class="text-xs text-gray-500">${order.customerPhone}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            ${itemsList}
+                        </td>
+                        <td class="px-6 py-4 font-bold text-primary">${order.totalAmount}</td>
+                        <td class="px-6 py-4 max-w-xs">
+                            <p class="text-xs text-gray-600 truncate" title="${order.address}">${order.address}</p>
+                            ${order.address.includes('GPS') ? '<a href="https://www.google.com/maps?q=' + extractGPS(order.address) + '" target="_blank" class="text-[10px] text-blue-500 hover:underline"><i class="fa-solid fa-location-dot"></i> View on Map</a>' : ''}
+                        </td>
+                        <td class="px-6 py-4">
+                            <select onchange="updateStatus('${order.id}', this.value)" class="bg-gray-50 border border-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-primary ${getStatusColor(order.status)}">
+                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                                <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                             <a href="tel:${order.customerPhone}" class="text-gray-400 hover:text-primary mx-1"><i class="fa-solid fa-phone"></i></a>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Pending': return 'text-orange-600 bg-orange-50';
+                case 'Processing': return 'text-blue-600 bg-blue-50';
+                case 'Shipped': return 'text-purple-600 bg-purple-50';
+                case 'Delivered': return 'text-green-600 bg-green-50';
+                case 'Cancelled': return 'text-red-600 bg-red-50';
+                default: return 'text-gray-600 bg-gray-50';
+            }
+        }
+
+        function extractGPS(addr) {
+            if(!addr.includes('GPS:')) return '';
+            return addr.split('GPS:')[1].replace(']', '').trim();
+        }
+
+        window.updateStatus = async (orderId, newStatus) => {
+            try {
+                await update(ref(db, `orders/${orderId}`), { status: newStatus });
+                window.showToast(`Order marked as ${newStatus}`);
+            } catch (e) {
+                console.error(e);
+                window.showToast("Failed to update status", "error");
+            }
+        };
+
+        // Expose functions to window for HTML onclick events
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+    </script>
+</body>
+</html>
