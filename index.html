@@ -241,7 +241,7 @@
 
     <footer class="bg-primary text-white pt-10 pb-6 mt-auto">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 <div>
                     <h3 class="text-xl font-bold brand-font text-secondary mb-4">RS Dry Fruits</h3>
                     <p class="text-gray-300 text-sm leading-relaxed">
@@ -267,7 +267,7 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fa-solid fa-envelope text-secondary"></i> 
-                            <span>support@rsdryfruits.com</span>
+                            <span class="break-words">support@rsdryfruits.com</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-location-dot text-secondary mt-1"></i> 
@@ -1041,6 +1041,7 @@
             try { await signOut(auth); window.cart = {}; updateCartUI(); window.showToast("Logged Out"); window.toggleModal('profile-modal', false); } catch (e) { console.error(e); }
         };
         
+        // --- ORDER HISTORY UPDATE ---
         window.openOrdersModal = async () => {
             if(!auth.currentUser) return;
             window.toggleModal('orders-modal', true);
@@ -1049,16 +1050,52 @@
             try {
                 const snapshot = await get(ref(rtdb, 'orders'));
                 if(!snapshot.exists()) { container.innerHTML = '<p class="text-center text-gray-500">No orders found.</p>'; return; }
-                const myOrders = Object.values(snapshot.val()).filter(order => order.email === auth.currentUser.email).sort((a, b) => b.orderDate - a.orderDate); 
+
+                // Using Object.entries to preserve the Order ID (Key)
+                const myOrders = Object.entries(snapshot.val())
+                    .map(([key, val]) => ({ id: key, ...val }))
+                    .filter(order => order.email === auth.currentUser.email)
+                    .sort((a, b) => b.orderDate - a.orderDate);
+
                 if(myOrders.length === 0) { container.innerHTML = '<p class="text-center text-gray-500">No orders found.</p>'; return; }
+
                 let html = '';
                 myOrders.forEach((data) => {
-                    const date = new Date(data.orderDate).toLocaleDateString();
-                    let itemsHtml = data.items.map(i => `<div class="flex justify-between text-xs text-gray-600"><span>${i.name} x ${i.qty}</span><span>₹${i.subtotal}</span></div>`).join('');
-                    html += `<div class="bg-gray-50 rounded-lg p-4 border hover:shadow-md transition"><div class="flex justify-between items-center mb-2 border-b pb-2"><span class="text-xs font-bold text-gray-500">${date}</span><span class="text-sm font-bold text-primary">${data.totalAmount}</span></div><div class="space-y-1 mb-2">${itemsHtml}</div><div class="text-xs text-right"><span class="px-2 py-1 rounded bg-secondary text-primary font-bold text-[10px]">${data.status || 'Received'}</span></div></div>`;
+                    // Format Date
+                    const date = new Date(data.orderDate).toLocaleDateString() + ' ' + new Date(data.orderDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    // Format Order ID (Show # + last 6 chars)
+                    const shortId = data.id ? '#' + data.id.slice(-6) : 'Order';
+
+                    // Format Items List with Units
+                    let itemsHtml = data.items.map(i => {
+                        const unitLabel = i.unit ? `<span class="text-[10px] text-gray-400">(${i.unit})</span>` : '';
+                        return `<div class="flex justify-between text-xs text-gray-600">
+                                    <span>${i.name} ${unitLabel} x ${i.qty}</span>
+                                    <span>₹${i.subtotal}</span>
+                                </div>`;
+                    }).join('');
+
+                    html += `
+                        <div class="bg-gray-50 rounded-lg p-4 border hover:shadow-md transition">
+                            <div class="flex justify-between items-center mb-2 border-b border-gray-200 pb-2">
+                                <div>
+                                    <span class="block text-xs font-bold text-primary">${shortId}</span>
+                                    <span class="text-[10px] text-gray-400">${date}</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">${data.totalAmount}</span>
+                            </div>
+                            <div class="space-y-1 mb-3 pt-1">
+                                ${itemsHtml}
+                            </div>
+                            <div class="text-xs text-right border-t border-gray-200 pt-2">
+                                <span class="text-gray-500 mr-2">Status:</span>
+                                <span class="px-2 py-1 rounded bg-secondary text-primary font-bold text-[10px] uppercase tracking-wide">${data.status || 'Received'}</span>
+                            </div>
+                        </div>`;
                 });
                 container.innerHTML = html;
-            } catch (e) { container.innerHTML = '<p class="text-center text-red-500">Failed to load.</p>'; }
+            } catch (e) { console.error(e); container.innerHTML = '<p class="text-center text-red-500">Failed to load.</p>'; }
         }
 
         window.addEventListener('load', () => {
